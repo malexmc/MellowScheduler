@@ -30,8 +30,42 @@ public class MellowScheduler extends Application
 {
     
     
-    public void newEmployeeSceneBuilder(Stage primaryStage){
-        GridPane grid = new GridPane();
+    public GridPane startGridBuilder(GridPane grid, Stage primaryStage)
+    {
+        grid.setAlignment(Pos.CENTER);
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.setPadding(new Insets(25, 25, 25, 25));
+        
+        Text scenetitle = new Text("Welcome");
+        scenetitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
+        grid.add(scenetitle, 0, 0, 2, 1);
+
+
+        //Created button and gives it style
+        Button btn = new Button("Sign in");
+        HBox hbBtn = new HBox(10);
+        hbBtn.setAlignment(Pos.BOTTOM_RIGHT);
+        hbBtn.getChildren().add(btn);
+        grid.add(hbBtn, 1, 4);
+        
+        //Text to be displayed. Will do nothing for now.
+        final Text actiontarget = new Text();
+        grid.add(actiontarget, 1, 6);
+        
+        //Handler for button.
+        btn.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent e) {
+                swapScene(sceneNames.NEW_EMPLOYEE, primaryStage);    
+            }
+        });
+        
+        return grid;
+    }
+    
+    public GridPane employeeGridBuilder(GridPane grid, Stage primaryStage)
+    {
         grid.setAlignment(Pos.CENTER);
         grid.setHgap(10);
         grid.setVgap(10);
@@ -67,7 +101,7 @@ public class MellowScheduler extends Application
         grid.add(hourlyWageTextField, 1, 3);
         
         //Employee quality
-        Label quality = new Label("Employee First Name:");
+        Label quality = new Label("Employee Quality:");
         grid.add(quality, 0, 4);
 
         TextField qualityTextField = new TextField();
@@ -75,18 +109,25 @@ public class MellowScheduler extends Application
 
       
 
-        //Create button and give it style
+        //Create save employee button
         Button saveButton = new Button("Save Employee");
         HBox hbsaveButton = new HBox(10);
         hbsaveButton.setAlignment(Pos.BOTTOM_RIGHT);
         hbsaveButton.getChildren().add(saveButton);
         grid.add(hbsaveButton, 1, 4);
         
+        //Create back button.
+        Button backButton = new Button("Save Employee");
+        HBox hbbackButton = new HBox(10);
+        hbbackButton.setAlignment(Pos.BOTTOM_RIGHT);
+        hbbackButton.getChildren().add(backButton);
+        grid.add(hbbackButton, 1, 4);
+        
         //Text to be displayed. Will do nothing for now.
         final Text actiontarget = new Text();
         grid.add(actiontarget, 1, 6);
         
-        //Handler for button.
+        //Handler for save button.
         saveButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent e) {
@@ -99,59 +140,51 @@ public class MellowScheduler extends Application
                 
                 actiontarget.setFill(Color.BLACK);
                 String employeeString = new String();
-                actiontarget.setText(newEmployee.getInformation(employeeString));
-             
+                actiontarget.setText(newEmployee.getInformation(employeeString));             
             }
         });
         
+        //Handler for back button. Will return to start application for now.
+        //TODO: revert to previous scene.
+        saveButton.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent e) {
                 
-        //Scene code.
-        //Give our scene the grid we have been building
-        Scene scene = new Scene(grid, 300, 275);
-        primaryStage.setScene(scene);
-        primaryStage.show();
+            }
+        });
+        
+        return grid;
+        
     }
 
+    public void swapScene(sceneNames sceneName, Stage primaryStage)
+    {
+        
+        GridPane grid = new GridPane();
+        switch(sceneName)
+        {
+            case START : 
+                startGridBuilder(grid, primaryStage);
+                break;
+                
+            case NEW_EMPLOYEE : 
+                employeeGridBuilder(grid, primaryStage);
+                break;
+        }
+        
+        //Scene code.
+        //Give our scene the grid we have been building
+        Scene newScene = new Scene(grid, 300, 275);
+        primaryStage.setScene(newScene);
+        primaryStage.show();
+    }
+    
     @Override
     public void start(Stage primaryStage) {
         
         //Stage is the big daddy for the whole application. Ours is primaryStage here.
         primaryStage.setTitle("JavaFX Welcome");
-        GridPane grid = new GridPane();
-        grid.setAlignment(Pos.CENTER);
-        grid.setHgap(10);
-        grid.setVgap(10);
-        grid.setPadding(new Insets(25, 25, 25, 25));
-        
-        Text scenetitle = new Text("Welcome");
-        scenetitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
-        grid.add(scenetitle, 0, 0, 2, 1);
-
-
-        //Created button and gives it style
-        Button btn = new Button("Sign in");
-        HBox hbBtn = new HBox(10);
-        hbBtn.setAlignment(Pos.BOTTOM_RIGHT);
-        hbBtn.getChildren().add(btn);
-        grid.add(hbBtn, 1, 4);
-        
-        //Text to be displayed. Will do nothing for now.
-        final Text actiontarget = new Text();
-        grid.add(actiontarget, 1, 6);
-        
-        //Handler for button.
-        btn.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent e) {
-                newEmployeeSceneBuilder(primaryStage);    
-            }
-        });
-        
-        //Scene code.
-        //Give our scene the grid we have been building
-        Scene scene = new Scene(grid, 300, 275);
-        primaryStage.setScene(scene);
-        primaryStage.show();
+        swapScene(sceneNames.START, primaryStage);
     }
     
     public void newEmployee(Stage primaryStage)
@@ -206,7 +239,14 @@ public class MellowScheduler extends Application
         primaryStage.setScene(scene);
         primaryStage.show();
     }
+    
+    public enum sceneNames 
+    {
+        START,
+        NEW_EMPLOYEE
+    }
 
+    
     /**
      * @param args the command line arguments
      */
