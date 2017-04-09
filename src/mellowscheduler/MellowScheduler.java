@@ -13,7 +13,6 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -27,8 +26,92 @@ import javafx.stage.Stage;
  *
  * @author Alex
  */
-public class MellowScheduler extends Application {
+public class MellowScheduler extends Application 
+{
     
+    
+    public void newEmployeeSceneBuilder(Stage primaryStage){
+        GridPane grid = new GridPane();
+        grid.setAlignment(Pos.CENTER);
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.setPadding(new Insets(25, 25, 25, 25));
+
+        Text scenetitle = new Text("New Employee");
+        scenetitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
+        
+        //Make sure grid has enough rows to accomodate the fields for the employee
+        grid.add(scenetitle, 0, 0, 4, 1);
+
+        
+        //Employee first name
+        Label firstName = new Label("Employee First Name:");
+        grid.add(firstName, 0, 1);
+
+        TextField firstNameTextField = new TextField();
+        grid.add(firstNameTextField, 1, 1);
+        
+        
+        //Employee last name
+        Label lastName = new Label("Employee Last Name:");
+        grid.add(lastName, 0, 2);
+
+        TextField lastNameTextField = new TextField();
+        grid.add(lastNameTextField, 1, 2);
+        
+        //Employee hourly wage
+        Label hourlyWage = new Label("Employee Hourly Wage:");
+        grid.add(hourlyWage, 0, 3);
+
+        TextField hourlyWageTextField = new TextField();
+        grid.add(hourlyWageTextField, 1, 3);
+        
+        //Employee quality
+        Label quality = new Label("Employee First Name:");
+        grid.add(quality, 0, 4);
+
+        TextField qualityTextField = new TextField();
+        grid.add(qualityTextField, 1, 4);
+
+      
+
+        //Create button and give it style
+        Button saveButton = new Button("Save Employee");
+        HBox hbsaveButton = new HBox(10);
+        hbsaveButton.setAlignment(Pos.BOTTOM_RIGHT);
+        hbsaveButton.getChildren().add(saveButton);
+        grid.add(hbsaveButton, 1, 4);
+        
+        //Text to be displayed. Will do nothing for now.
+        final Text actiontarget = new Text();
+        grid.add(actiontarget, 1, 6);
+        
+        //Handler for button.
+        saveButton.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent e) {
+                //Assign the members of the employee based on the text provided in the fields
+                Employee newEmployee = new Employee();
+                newEmployee.setFirstName(firstNameTextField.getText());
+                newEmployee.setLastName(lastNameTextField.getText());
+                newEmployee.setHourlyWage(Double.parseDouble(hourlyWageTextField.getText()));
+                newEmployee.setQuality(Integer.parseInt(qualityTextField.getText()));
+                
+                actiontarget.setFill(Color.BLACK);
+                String employeeString = new String();
+                actiontarget.setText(newEmployee.getInformation(employeeString));
+             
+            }
+        });
+        
+                
+        //Scene code.
+        //Give our scene the grid we have been building
+        Scene scene = new Scene(grid, 300, 275);
+        primaryStage.setScene(scene);
+        primaryStage.show();
+    }
+
     @Override
     public void start(Stage primaryStage) {
         
@@ -44,6 +127,49 @@ public class MellowScheduler extends Application {
         scenetitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
         grid.add(scenetitle, 0, 0, 2, 1);
 
+
+        //Created button and gives it style
+        Button btn = new Button("Sign in");
+        HBox hbBtn = new HBox(10);
+        hbBtn.setAlignment(Pos.BOTTOM_RIGHT);
+        hbBtn.getChildren().add(btn);
+        grid.add(hbBtn, 1, 4);
+        
+        //Text to be displayed. Will do nothing for now.
+        final Text actiontarget = new Text();
+        grid.add(actiontarget, 1, 6);
+        
+        //Handler for button.
+        btn.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent e) {
+                newEmployeeSceneBuilder(primaryStage);    
+            }
+        });
+        
+        //Scene code.
+        //Give our scene the grid we have been building
+        Scene scene = new Scene(grid, 300, 275);
+        primaryStage.setScene(scene);
+        primaryStage.show();
+    }
+    
+    public void newEmployee(Stage primaryStage)
+    {
+        //Stage is the big daddy for the whole application. Ours is primaryStage here.
+        primaryStage.setTitle("JavaFX Welcome");
+        GridPane grid = new GridPane();
+        grid.setAlignment(Pos.CENTER);
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.setPadding(new Insets(25, 25, 25, 25));
+        
+        Text scenetitle = new Text("Welcome");
+        scenetitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
+        grid.add(scenetitle, 0, 0, 2, 1);
+
+        
+        //Username field
         Label userName = new Label("User Name:");
         grid.add(userName, 0, 1);
 
@@ -53,8 +179,6 @@ public class MellowScheduler extends Application {
         Label pw = new Label("Password:");
         grid.add(pw, 0, 2);
 
-        PasswordField pwBox = new PasswordField();
-        grid.add(pwBox, 1, 2);
 
         //Created button and gives it style
         Button btn = new Button("Sign in");
@@ -72,7 +196,7 @@ public class MellowScheduler extends Application {
             @Override
             public void handle(ActionEvent e) {
                 actiontarget.setFill(Color.FIREBRICK);
-                actiontarget.setText("Username = " + userTextField.getText() + "\nPassword = " + pwBox.getText() );
+                actiontarget.setText("Got 'eem!");
             }
         });
         
@@ -86,7 +210,8 @@ public class MellowScheduler extends Application {
     /**
      * @param args the command line arguments
      */
-    public static void main(String[] args) {
+    public static void main(String[] args) 
+    {
         launch(args);
     }
     
