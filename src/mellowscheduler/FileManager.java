@@ -11,7 +11,12 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Dictionary;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.json.simple.JSONArray;
@@ -57,9 +62,6 @@ public class FileManager {
     //TODO: Save JSON data intelligently so that employees are not duplicated
     public void JSONWriter(Employee employeeToWrite)
     {
-        
-
-                
                  //Get all currently written employees before we destroy them.
                 ArrayList<Employee> employees = new ArrayList<>();
                 JSONReader(employees);
@@ -88,10 +90,10 @@ public class FileManager {
                         //Make employee into JSON object, and add to list.
                         JSONObject newJSON = new JSONObject();
 
-                        newJSON.put("First Name", employeeToWrite.getFirstName());
-                        newJSON.put("Last Name", employeeToWrite.getLastName());
-                        newJSON.put("Hourly Wage", employeeToWrite.getHourlyWage().toString());
-                        newJSON.put("Quality", employeeToWrite.getQuality().toString());
+                        newJSON.put("first name", employeeToWrite.getFirstName());
+                        newJSON.put("last name", employeeToWrite.getLastName());
+                        newJSON.put("hourly wage", employeeToWrite.getHourlyWage().toString());
+                        newJSON.put("quality", employeeToWrite.getQuality().toString());
 
                         employeeJSONs.add(newJSON);
                     }
@@ -109,6 +111,61 @@ public class FileManager {
                  }
                  
                
+    }
+    
+    public void JSONWriter(Schedule scheduleToWrite)
+    {
+        //Make JSONObject to hold week schedule
+        JSONObject weekScheduleJSON = new JSONObject();
+        
+        //Make list for dailySchedules
+        JSONArray dailySchedulesJSON = new JSONArray();
+        
+        //Make JSON Object for each day
+        for (int ii = 0; ii < 7; ii++)
+        {
+            
+            JSONObject currentDay = new JSONObject();
+            JSONArray workPairs = new JSONArray();
+            
+            Map<Shift, Employee> currentDayPairs = scheduleToWrite.getSchedule().get(ii);
+            
+            
+            for(Shift currentShift : currentDayPairs.keySet())
+            {
+                JSONArray workPair = new JSONArray();
+                Employee currentEmployee = currentDayPairs.get(currentShift);
+                
+                JSONObject currentShiftJSON = new JSONObject();
+                JSONObject currentEmployeeJSON = new JSONObject();
+                
+                
+                currentShiftJSON.put("start time", currentShift.getStartTime());
+                currentShiftJSON.put("end time", currentShift.getEndTime());
+                
+                currentEmployeeJSON.put("first name", currentEmployee.getFirstName());
+                currentEmployeeJSON.put("Last name", currentEmployee.getLastName());
+                currentEmployeeJSON.put("hourly wage", currentEmployee.getHourlyWage().toString());
+                currentEmployeeJSON.put("quality", currentEmployee.getQuality().toString());
+                
+                workPair.add(currentShiftJSON);
+                workPair.add(currentEmployeeJSON);
+                workPairs.add(workPair);
+            }
+            
+            currentDay.put("work pairs", workPairs);
+            dailySchedulesJSON.add(currentDay);
+        }
+        weekScheduleJSON.put("daily schedules", dailySchedulesJSON);
+            
+        //Get write handle right before because it destroys everything
+        try (FileWriter employeeWriteHandle = new FileWriter("./" + scheduleToWrite.getName() + ".JSON", false ))
+        {
+           employeeWriteHandle.write(weekScheduleJSON.toJSONString());    
+        }
+        catch(Exception e)
+        {
+        }
     }
     
     public ArrayList<Employee> JSONReader(ArrayList<Employee> employees)
@@ -135,10 +192,10 @@ public class FileManager {
                 JSONObject currentEmployeeJSON = employeesIterator.next();
                 Employee currentEmployee = new Employee();
             
-                currentEmployee.setFirstName( (String) currentEmployeeJSON.get("First Name") );
-                currentEmployee.setLastName( (String) currentEmployeeJSON.get("Last Name") );
-                currentEmployee.setHourlyWage( Double.parseDouble( (String) currentEmployeeJSON.get("Hourly Wage") ) );
-                currentEmployee.setQuality( Integer.parseInt( (String) currentEmployeeJSON.get("Quality") ) );
+                currentEmployee.setFirstName( (String) currentEmployeeJSON.get("first name") );
+                currentEmployee.setLastName( (String) currentEmployeeJSON.get("last name") );
+                currentEmployee.setHourlyWage( Double.parseDouble( (String) currentEmployeeJSON.get("hourly wage") ) );
+                currentEmployee.setQuality( Integer.parseInt( (String) currentEmployeeJSON.get("quality") ) );
 
                 employees.add(currentEmployee);
             }
@@ -155,4 +212,88 @@ public class FileManager {
         return employees;
     }
     
+    
+    
+//    schedules : 
+//    {
+//        { "day" : "monday" ,
+//          "workpairs" : [   [ "shift" : {SHIFTINFO}
+//                                    "employee" : {EMPLOYEEINFO}],
+//                                   ...
+//                             ]
+//        },
+//        ...
+//    }
+    
+    public Schedule JSONScheduleReader(String scheduleName)
+    {
+        
+        JSONParser parser = new JSONParser();
+        Schedule currentSchedule = new Schedule();
+        
+        try (FileReader JSONFile = new FileReader("./" + scheduleName + ".JSON"))
+        {
+            Object obj = parser.parse(JSONFile);
+            
+            //Store the scheduleContainer
+            JSONObject scheduleContainer = (JSONObject) obj;
+            
+            //From the schedule container, get the list of schedules
+            JSONArray dailySchedulesJSON = (JSONArray) scheduleContainer.get("daily schedules");
+            Iterator<JSONObject> schedulesIterator = dailySchedulesJSON.iterator();
+
+            //Make a list to store the daily shift-employee pairings
+            ArrayList< Map<Shift, Employee> > dailySchedules = new ArrayList<>();
+            
+            while (schedulesIterator.hasNext())
+            {
+                
+                
+                JSONObject currentScheduleJSON = schedulesIterator.next();
+                
+                //From each schedule, get the workpairs and store them.
+                JSONArray workPairsJSON = (JSONArray) currentScheduleJSON.get("work pairs");
+                Iterator<JSONObject> workPairsIterator = workPairsJSON.iterator();
+                
+                //Make a map to keep track of individual day's shift-employee pairs
+                Map<Shift, Employee> currentWorkPairs = new HashMap<>();
+                
+                while(workPairsIterator.hasNext())
+                {
+                    
+                    JSONObject currentWorkPair = (JSONObject) workPairsIterator.next();
+                    
+                    //Extract employee and shift from workpair
+                    JSONObject currentShiftJSON =  (JSONObject) currentWorkPair.get("shift");
+                    JSONObject currentEmployeeJSON =  (JSONObject) currentWorkPair.get("employee");
+                    
+                    //Make employee and shift objects
+                    Employee currentEmployee = new Employee();
+                    Shift currentShift = new Shift();
+
+                    //Assign Employee Stuff
+                    currentEmployee.setFirstName( (String) currentEmployeeJSON.get("first name") );
+                    currentEmployee.setLastName( (String) currentEmployeeJSON.get("nast name") );
+                    currentEmployee.setHourlyWage( Double.parseDouble( (String) currentEmployeeJSON.get("hourly wage") ) );
+                    currentEmployee.setQuality( Integer.parseInt( (String) currentEmployeeJSON.get("quality") ) );
+                    
+                    //Assign Shift Stuff
+                    currentShift.setStartTime( (String) currentEmployeeJSON.get("start time") );
+                    currentShift.setEndTime( (String) currentEmployeeJSON.get("end time") );
+                     
+                    //Add the employee and shift to the map
+                    currentWorkPairs.put(currentShift, currentEmployee);
+                }
+                //Add the generated map to the list of maps
+                dailySchedules.add(currentWorkPairs);
+            }
+            //set the completed list of maps to be the schedule
+            currentSchedule.setSchedule(dailySchedules);
+        }   
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        return currentSchedule;
+    }
 }
