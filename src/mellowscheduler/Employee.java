@@ -25,9 +25,9 @@ public class Employee {
         hourlyWage = 0.0;
         quality = 0;
         
-        ArrayList<Employee> employees = new ArrayList<Employee>();
-        FileManager fileManager = new FileManager();
-        fileManager.JSONReader(employees);
+//        ArrayList<Employee> employees = new ArrayList<>();
+//        FileManager fileManager = new FileManager();
+//        fileManager.JSONReader(employees);
     }
     
     //Member set functions

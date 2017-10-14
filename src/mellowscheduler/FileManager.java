@@ -5,12 +5,15 @@
  */
 package mellowscheduler;
 
- 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -22,29 +25,90 @@ import org.json.simple.parser.ParseException;
  */
 public class FileManager {
     
+    //Makes sure the file a given directory exists
+    private  boolean ensure_file_exist(String filePath )
+    {
+        
+        //TODO: Make directory dynamic
+        File employeeFile = new File(filePath);
+  
+        try {
+            //Create the file
+            if (employeeFile.createNewFile())
+            {
+                System.out.println("File is created!");
+            }
+            else
+            {
+                System.out.println("File already exists.");
+                return false;
+            }
+            
+                    } 
+        catch (IOException e) {
+            Logger.getLogger(FileManager.class.getName()).log(Level.SEVERE, null, e);
+            return false;
+        }
+        
+        return true;
+    }
+        
     //Currently used to write employee data stored in memory into a JSON file.
     //TODO: Save JSON data intelligently so that employees are not duplicated
     public void JSONWriter(Employee employeeToWrite)
     {
-        //TODO: Make directory dynamic
-        try (FileWriter file = new FileWriter("C:\\Users\\Alex\\Documents\\Employees.JSON", true) ) 
-        {
+        
+
                 
-                JSONObject newJSON = new JSONObject();
+                 //Get all currently written employees before we destroy them.
+                ArrayList<Employee> employees = new ArrayList<>();
+                JSONReader(employees);
                 
-                newJSON.put("First Name", employeeToWrite.getFirstName());
-                newJSON.put("Last Name", employeeToWrite.getLastName());
-                newJSON.put("Hourly Wage", employeeToWrite.getHourlyWage().toString());
-                newJSON.put("Quality", employeeToWrite.getQuality().toString());
+                //Make sure new employee is not already in system
+                for (Employee currentEmployee : employees)
+                {
+                    //Assume employees with same name are the same person
+                    if (currentEmployee.getFirstName().equals(employeeToWrite.getFirstName()) && currentEmployee.getLastName().equals(employeeToWrite.getLastName()))
+                    {
+                        //TODO: make this return some message to let user know employee already existed.
+                        return;
+                    }
+                }
                 
-                file.write(newJSON.toJSONString());
-                System.out.println("Successfully Copied JSON Object to File...");
-                System.out.println("\nJSON Object: " + newJSON);
-        }
-        catch (Exception e)
-        {
-                    
-        }
+                employees.add(employeeToWrite);
+
+                //Make container for employees
+                JSONObject employeesJSON = new JSONObject();
+                
+                //Make list for employees and add employee JSONs to it
+                JSONArray employeeJSONs = new JSONArray();
+                
+                    for (Employee currentEmployee : employees)
+                    {
+                        //Make employee into JSON object, and add to list.
+                        JSONObject newJSON = new JSONObject();
+
+                        newJSON.put("First Name", employeeToWrite.getFirstName());
+                        newJSON.put("Last Name", employeeToWrite.getLastName());
+                        newJSON.put("Hourly Wage", employeeToWrite.getHourlyWage().toString());
+                        newJSON.put("Quality", employeeToWrite.getQuality().toString());
+
+                        employeeJSONs.add(newJSON);
+                    }
+                
+                 employeesJSON.put("employees", employeeJSONs);
+                 
+                 
+                 //Get write handle right before because it destroys everything
+                 try (FileWriter employeeWriteHandle = new FileWriter("./Employees.JSON", false ))
+                 {
+                    employeeWriteHandle.write(employeesJSON.toJSONString());    
+                 }
+                 catch(Exception e)
+                 {
+                 }
+                 
+               
     }
     
     public ArrayList<Employee> JSONReader(ArrayList<Employee> employees)
@@ -52,48 +116,41 @@ public class FileManager {
         
         JSONParser parser = new JSONParser();
 
-        try 
+        try (FileReader JSONFile = new FileReader("./Employees.JSON") )
         {
             
-            //Parses one employee JSON object and adds it to the employees array
-            Object obj = parser.parse(new FileReader("C:\\Users\\Alex\\Documents\\Employees.JSON"));
+            //Parses the file
+            Object obj = parser.parse(JSONFile);
 
-            JSONObject jsonObject = (JSONObject) obj;
-            System.out.println(jsonObject);
-
-            Employee currentEmployee = new Employee();
             
-            currentEmployee.setFirstName( (String) jsonObject.get("First Name") );
-            currentEmployee.setLastName( (String) jsonObject.get("Last Name") );
-            currentEmployee.setHourlyWage( (Double) jsonObject.get("Hourly Wage") );
-            currentEmployee.setQuality( (Integer) jsonObject.get("Quality") );
+            JSONObject employeeContainerJSON = (JSONObject) obj;
 
-            employees.add(currentEmployee);
+            //From the employee container, we'll get the list of employees, and set up an iterator for it
+            JSONArray employeesJSON = (JSONArray) employeeContainerJSON.get("employees");
+            Iterator<JSONObject> employeesIterator = employeesJSON.iterator();
+            
+            //For as long as we have more employees, turn them into employee objects, and add them to the employees list.
+            while (employeesIterator.hasNext())
+            {
+                JSONObject currentEmployeeJSON = employeesIterator.next();
+                Employee currentEmployee = new Employee();
+            
+                currentEmployee.setFirstName( (String) currentEmployeeJSON.get("First Name") );
+                currentEmployee.setLastName( (String) currentEmployeeJSON.get("Last Name") );
+                currentEmployee.setHourlyWage( Double.parseDouble( (String) currentEmployeeJSON.get("Hourly Wage") ) );
+                currentEmployee.setQuality( Integer.parseInt( (String) currentEmployeeJSON.get("Quality") ) );
+
+                employees.add(currentEmployee);
+            }
+            
+
         }
-//            String name = (String) jsonObject.get("name");
-//            System.out.println(name);
-//
-//            long age = (Long) jsonObject.get("age");
-//            System.out.println(age);
-//
-//            // loop array
-//            JSONArray msg = (JSONArray) jsonObject.get("messages");
-//            Iterator<String> iterator = msg.iterator();
-//            while (iterator.hasNext()) {
-//                System.out.println(iterator.next());
-//            }
 
-        catch (FileNotFoundException e)
+        catch (Exception e)
         {
             e.printStackTrace();
         } 
-        catch (IOException e)
-        {
-            e.printStackTrace();
-        } catch (ParseException e)
-        {
-            e.printStackTrace();
-        }
+
 
         return employees;
     }
