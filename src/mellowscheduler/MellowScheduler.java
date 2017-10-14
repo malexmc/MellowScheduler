@@ -75,7 +75,7 @@ public class MellowScheduler extends Application
         scenetitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
         
         //Make sure grid has enough rows to accomodate the fields for the employee
-        grid.add(scenetitle, 0, 0, 4, 1);
+        grid.add(scenetitle, 0, 0, 1, 1);
 
         
         //Employee first name
@@ -114,14 +114,14 @@ public class MellowScheduler extends Application
         HBox hbsaveButton = new HBox(10);
         hbsaveButton.setAlignment(Pos.BOTTOM_RIGHT);
         hbsaveButton.getChildren().add(saveButton);
-        grid.add(hbsaveButton, 1, 4);
+        grid.add(hbsaveButton, 1, 5);
         
         //Create back button.
-        Button backButton = new Button("Save Employee");
+        Button backButton = new Button("Back");
         HBox hbbackButton = new HBox(10);
-        hbbackButton.setAlignment(Pos.BOTTOM_RIGHT);
+        hbbackButton.setAlignment(Pos.BOTTOM_LEFT);
         hbbackButton.getChildren().add(backButton);
-        grid.add(hbbackButton, 1, 4);
+        grid.add(hbbackButton, 0, 5);
         
         //Text to be displayed. Will do nothing for now.
         final Text actiontarget = new Text();
@@ -138,6 +138,9 @@ public class MellowScheduler extends Application
                 newEmployee.setHourlyWage(Double.parseDouble(hourlyWageTextField.getText()));
                 newEmployee.setQuality(Integer.parseInt(qualityTextField.getText()));
                 
+                FileManager fileManager = new FileManager();
+                fileManager.JSONWriter(newEmployee);
+                
                 actiontarget.setFill(Color.BLACK);
                 String employeeString = new String();
                 actiontarget.setText(newEmployee.getInformation(employeeString));             
@@ -145,11 +148,10 @@ public class MellowScheduler extends Application
         });
         
         //Handler for back button. Will return to start application for now.
-        //TODO: revert to previous scene.
-        saveButton.setOnAction(new EventHandler<ActionEvent>() {
+        backButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent e) {
-                
+                swapScene(sceneNames.START, primaryStage);
             }
         });
         
@@ -187,6 +189,7 @@ public class MellowScheduler extends Application
         swapScene(sceneNames.START, primaryStage);
     }
     
+/*   
     public void newEmployee(Stage primaryStage)
     {
         //Stage is the big daddy for the whole application. Ours is primaryStage here.
@@ -239,7 +242,7 @@ public class MellowScheduler extends Application
         primaryStage.setScene(scene);
         primaryStage.show();
     }
-    
+*/    
     public enum sceneNames 
     {
         START,

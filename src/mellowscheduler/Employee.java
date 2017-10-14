@@ -5,11 +5,14 @@
  */
 package mellowscheduler;
 
+import java.util.ArrayList;
+
 /**
  *
  * @author Alex
  */
 public class Employee {
+    private Integer employeeID;
     private String firstName;
     private String lastName;
     private Double hourlyWage;
@@ -21,9 +24,18 @@ public class Employee {
         lastName = "";
         hourlyWage = 0.0;
         quality = 0;
+        
+        ArrayList<Employee> employees = new ArrayList<Employee>();
+        FileManager fileManager = new FileManager();
+        fileManager.JSONReader(employees);
     }
     
     //Member set functions
+    public void setEmployeeID(Integer value)
+    {
+        employeeID = value;
+    }
+    
     public void setFirstName(String value)
     {
         firstName = value;
@@ -46,6 +58,11 @@ public class Employee {
     
     
     //Member get functions
+    public Integer getEmployeeID()
+    {
+        return employeeID;
+    }
+    
     public String getFirstName()
     {
         return firstName;
