@@ -58,60 +58,79 @@ public class FileManager {
         return true;
     }
         
-    //Currently used to write employee data stored in memory into a JSON file.
-    //TODO: Save JSON data intelligently so that employees are not duplicated
-    public void JSONWriter(Employee employeeToWrite)
+    
+    public JSONObject employeesToJSON(Employee employeeToWrite, String fileName)
     {
-                 //Get all currently written employees before we destroy them.
-                ArrayList<Employee> employees = new ArrayList<>();
-                JSONReader(employees);
-                
-                //Make sure new employee is not already in system
-                for (Employee currentEmployee : employees)
-                {
-                    //Assume employees with same name are the same person
-                    if (currentEmployee.getFirstName().equals(employeeToWrite.getFirstName()) && currentEmployee.getLastName().equals(employeeToWrite.getLastName()))
-                    {
-                        //TODO: make this return some message to let user know employee already existed.
-                        return;
-                    }
-                }
-                
-                employees.add(employeeToWrite);
+        //Get all currently written employees before we destroy them.
+        ArrayList<Employee> employees = new ArrayList<>();
+        JSONReader(employees, fileName);
 
-                //Make container for employees
-                JSONObject employeesJSON = new JSONObject();
-                
-                //Make list for employees and add employee JSONs to it
-                JSONArray employeeJSONs = new JSONArray();
-                
-                    for (Employee currentEmployee : employees)
-                    {
-                        //Make employee into JSON object, and add to list.
-                        JSONObject newJSON = new JSONObject();
+        //Make sure new employee is not already in system
+        for (Employee currentEmployee : employees)
+        {
+            //Assume employees with same name are the same person
+            if (currentEmployee.getFirstName().equals(employeeToWrite.getFirstName()) && currentEmployee.getLastName().equals(employeeToWrite.getLastName()))
+            {
+                //TODO: make this return some message to let user know employee already existed.
+                return null;
+            }
+        }
 
-                        newJSON.put("first name", employeeToWrite.getFirstName());
-                        newJSON.put("last name", employeeToWrite.getLastName());
-                        newJSON.put("hourly wage", employeeToWrite.getHourlyWage().toString());
-                        newJSON.put("quality", employeeToWrite.getQuality().toString());
+        employees.add(employeeToWrite);
 
-                        employeeJSONs.add(newJSON);
-                    }
-                
-                 employeesJSON.put("employees", employeeJSONs);
+        //Make container for employees
+        JSONObject employeesJSON = new JSONObject();
+
+        //Make list for employees and add employee JSONs to it
+        JSONArray employeeJSONs = new JSONArray();
+
+            for (Employee currentEmployee : employees)
+            {
+                //Make employee into JSON object, and add to list.
+                JSONObject newJSON = new JSONObject();
+
+                newJSON.put("first name", employeeToWrite.getFirstName());
+                newJSON.put("last name", employeeToWrite.getLastName());
+                newJSON.put("hourly wage", employeeToWrite.getHourlyWage().toString());
+                newJSON.put("quality", employeeToWrite.getQuality().toString());
+
+                employeeJSONs.add(newJSON);
+            }
+
+         employeesJSON.put("employees", employeeJSONs);
+        return employeesJSON;
+    }
+    
+    
+        //Currently used to write employee data stored in memory into a JSON file.
+    public void JSONWriter(Employee employeeToWrite, String fileName)
+    {
                  
+        JSONObject employeesJSON = employeesToJSON(employeeToWrite, fileName);
                  
+        if (employeesJSON != null)
+        {
                  //Get write handle right before because it destroys everything
-                 try (FileWriter employeeWriteHandle = new FileWriter("./Employees.JSON", false ))
+                 try (FileWriter employeeWriteHandle = new FileWriter("./" + fileName + ".JSON", false ))
                  {
                     employeeWriteHandle.write(employeesJSON.toJSONString());    
                  }
                  catch(Exception e)
                  {
                  }
+        }
+            
                  
                
     }
+    
+        //Calls JSONWriter with the default file name
+    public void JSONWriter(Employee employeeToWrite)
+    {
+        JSONWriter(employeeToWrite, "Employees");
+    }
+    
+
     
     public void JSONWriter(Schedule scheduleToWrite)
     {
@@ -168,12 +187,12 @@ public class FileManager {
         }
     }
     
-    public ArrayList<Employee> JSONReader(ArrayList<Employee> employees)
+    public ArrayList<Employee> JSONReader(ArrayList<Employee> employees, String fileName)
     {
         
         JSONParser parser = new JSONParser();
 
-        try (FileReader JSONFile = new FileReader("./Employees.JSON") )
+        try (FileReader JSONFile = new FileReader("./" + fileName + ".JSON") )
         {
             
             //Parses the file

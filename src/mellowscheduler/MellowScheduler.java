@@ -131,7 +131,7 @@ public class MellowScheduler extends Application {
 
             actiontarget.setFill(Color.BLACK);
             String employeeString = new String();
-            actiontarget.setText(newEmployee.getInformation(employeeString));
+            actiontarget.setText(newEmployee.getInformation());
         });
 
         //Handler for back button. Will return to start application for now.

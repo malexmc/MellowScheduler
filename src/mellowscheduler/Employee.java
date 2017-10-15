@@ -85,8 +85,9 @@ public class Employee {
     
 
 
-    public String getInformation(String returnString)
+    public String getInformation()
     {
+        String returnString = "";
         returnString = "First Name: " + firstName + 
            "\nLast Name: " + lastName + 
            "\nHourly Wage: " + hourlyWage.toString() + 
