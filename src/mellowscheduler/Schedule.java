@@ -44,23 +44,4 @@ public class Schedule {
     {
         name = newName;
     }
-    
-    public void makeSchedule() //
-    {
-        //Take in constraints
-        //Take in employees
-        //Take in shifts
-        
-        //For each day...
-            //For each shift, save all employees that can work it based on availability constraints
-            //Place all shift arrays into a larger array for the day
-        
-        //Move through day -> shift-employee arrays
-            //If employee can be added to a shift, and doesn't have an overlapping shift, schedule him/her
-        
-        //Once all shifts are added, file through days to make sure other constraints are met
-        
-        //If shift is all good, return it.
-        
-    }
 }
