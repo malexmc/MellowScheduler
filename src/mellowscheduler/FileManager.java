@@ -11,12 +11,9 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Dictionary;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.json.simple.JSONArray;
@@ -101,40 +98,9 @@ public class FileManager {
         return employeesJSON;
     }
     
-    
-        //Currently used to write employee data stored in memory into a JSON file.
-    public void JSONWriter(Employee employeeToWrite, String fileName)
+    public JSONObject scheduleToJSON(Schedule scheduleToWrite)
     {
-                 
-        JSONObject employeesJSON = employeesToJSON(employeeToWrite, fileName);
-                 
-        if (employeesJSON != null)
-        {
-                 //Get write handle right before because it destroys everything
-                 try (FileWriter employeeWriteHandle = new FileWriter("./" + fileName + ".JSON", false ))
-                 {
-                    employeeWriteHandle.write(employeesJSON.toJSONString());    
-                 }
-                 catch(Exception e)
-                 {
-                 }
-        }
-            
-                 
-               
-    }
-    
-        //Calls JSONWriter with the default file name
-    public void JSONWriter(Employee employeeToWrite)
-    {
-        JSONWriter(employeeToWrite, "Employees");
-    }
-    
-
-    
-    public void JSONWriter(Schedule scheduleToWrite)
-    {
-        //Make JSONObject to hold week schedule
+                //Make JSONObject to hold week schedule
         JSONObject weekScheduleJSON = new JSONObject();
         
         //Make list for dailySchedules
@@ -176,6 +142,45 @@ public class FileManager {
             dailySchedulesJSON.add(currentDay);
         }
         weekScheduleJSON.put("daily schedules", dailySchedulesJSON);
+        return weekScheduleJSON;
+    }
+    
+    
+        //Currently used to write employee data stored in memory into a JSON file.
+    public void JSONWriter(Employee employeeToWrite, String fileName)
+    {
+                 
+        JSONObject employeesJSON = employeesToJSON(employeeToWrite, fileName);
+                 
+        if (employeesJSON != null)
+        {
+                 //Get write handle right before because it destroys everything
+                 try 
+                 {
+                    FileWriter employeeWriteHandle = new FileWriter("./" + fileName + ".JSON", false );
+                    employeeWriteHandle.write(employeesJSON.toJSONString());    
+                 }
+                 catch(Exception e)
+                 {
+                 }
+        }
+            
+                 
+               
+    }
+    
+     //Calls JSONWriter with the default file name
+    public void JSONWriter(Employee employeeToWrite)
+    {
+        JSONWriter(employeeToWrite, "Employees");
+    }
+    
+
+    
+    public void JSONWriter(Schedule scheduleToWrite)
+    {
+
+        JSONObject weekScheduleJSON = scheduleToJSON(scheduleToWrite);
             
         //Get write handle right before because it destroys everything
         try (FileWriter employeeWriteHandle = new FileWriter("./" + scheduleToWrite.getName() + ".JSON", false ))
@@ -192,25 +197,43 @@ public class FileManager {
         
         JSONParser parser = new JSONParser();
 
-        try (FileReader JSONFile = new FileReader("./" + fileName + ".JSON") )
+        Object obj = null;
+       
+        
+        try
         {
-            
-            //Parses the file
-            Object obj = parser.parse(JSONFile);
+            FileReader JSONFile = new FileReader("./" + fileName + ".JSON");
 
-            
+            //Parses the file
+            obj = parser.parse(JSONFile);
+        }
+        catch (FileNotFoundException e)
+        {
+            System.out.print("Could not find file: ./" + fileName + ".JSON to read\nAssuming no employees exist." );
+        } 
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        } 
+        catch (ParseException e)
+        {
+            System.out.print("Fle: ./" + fileName + ".JSON contains bad JSON data.");
+        }
+
+        if (obj != null)
+        {
             JSONObject employeeContainerJSON = (JSONObject) obj;
 
             //From the employee container, we'll get the list of employees, and set up an iterator for it
             JSONArray employeesJSON = (JSONArray) employeeContainerJSON.get("employees");
             Iterator<JSONObject> employeesIterator = employeesJSON.iterator();
-            
+
             //For as long as we have more employees, turn them into employee objects, and add them to the employees list.
             while (employeesIterator.hasNext())
             {
                 JSONObject currentEmployeeJSON = employeesIterator.next();
                 Employee currentEmployee = new Employee();
-            
+
                 currentEmployee.setFirstName( (String) currentEmployeeJSON.get("first name") );
                 currentEmployee.setLastName( (String) currentEmployeeJSON.get("last name") );
                 currentEmployee.setHourlyWage( Double.parseDouble( (String) currentEmployeeJSON.get("hourly wage") ) );
@@ -218,15 +241,7 @@ public class FileManager {
 
                 employees.add(currentEmployee);
             }
-            
-
         }
-
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        } 
-
 
         return employees;
     }
@@ -270,7 +285,7 @@ public class FileManager {
                 
                 JSONObject currentScheduleJSON = schedulesIterator.next();
                 
-                //From each schedule, get the workpairs and store them.
+                //From each schedule, get the workpairs object and store them.
                 JSONArray workPairsJSON = (JSONArray) currentScheduleJSON.get("work pairs");
                 Iterator<JSONObject> workPairsIterator = workPairsJSON.iterator();
                 
@@ -279,29 +294,41 @@ public class FileManager {
                 
                 while(workPairsIterator.hasNext())
                 {
+                    //Get the array of the array of shift-employee pairs
+                    Object currentWorkPairObj = workPairsIterator.next();
+                    JSONArray currentWorkPair = new JSONArray();
+                    currentWorkPair.add(currentWorkPairObj);
+                    Iterator<JSONObject> currentWorkPairIterator = currentWorkPair.iterator();
                     
-                    JSONObject currentWorkPair = (JSONObject) workPairsIterator.next();
-                    
-                    //Extract employee and shift from workpair
-                    JSONObject currentShiftJSON =  (JSONObject) currentWorkPair.get("shift");
-                    JSONObject currentEmployeeJSON =  (JSONObject) currentWorkPair.get("employee");
-                    
-                    //Make employee and shift objects
-                    Employee currentEmployee = new Employee();
-                    Shift currentShift = new Shift();
+                    while(currentWorkPairIterator.hasNext())
+                    {
+                        
+                        Object currentWorkPairInternalsObj =  currentWorkPairIterator.next();
+                        JSONArray currentWorkPairInternals = new JSONArray();
+                        currentWorkPairInternals.add(currentWorkPairInternalsObj);
+                        
+                        //Get each shift-employee array, and parse it
+                        JSONObject currentShiftJSON = (JSONObject) currentWorkPairInternals.get(0);
+                        JSONObject currentEmployeeJSON = (JSONObject) currentWorkPairInternals.get(1);
 
-                    //Assign Employee Stuff
-                    currentEmployee.setFirstName( (String) currentEmployeeJSON.get("first name") );
-                    currentEmployee.setLastName( (String) currentEmployeeJSON.get("nast name") );
-                    currentEmployee.setHourlyWage( Double.parseDouble( (String) currentEmployeeJSON.get("hourly wage") ) );
-                    currentEmployee.setQuality( Integer.parseInt( (String) currentEmployeeJSON.get("quality") ) );
+                        //Make employee and shift objects
+                        Employee currentEmployee = new Employee();
+                        Shift currentShift = new Shift();
+
+                        //Assign Employee Stuff
+                        currentEmployee.setFirstName( (String) currentEmployeeJSON.get("first name") );
+                        currentEmployee.setLastName( (String) currentEmployeeJSON.get("nast name") );
+                        currentEmployee.setHourlyWage( Double.parseDouble( (String) currentEmployeeJSON.get("hourly wage") ) );
+                        currentEmployee.setQuality( Integer.parseInt( (String) currentEmployeeJSON.get("quality") ) );
+
+                        //Assign Shift Stuff
+                        currentShift.setStartTime( (String) currentEmployeeJSON.get("start time") );
+                        currentShift.setEndTime( (String) currentEmployeeJSON.get("end time") );
+
+                        //Add the employee and shift to the map
+                        currentWorkPairs.put(currentShift, currentEmployee);
+                    }
                     
-                    //Assign Shift Stuff
-                    currentShift.setStartTime( (String) currentEmployeeJSON.get("start time") );
-                    currentShift.setEndTime( (String) currentEmployeeJSON.get("end time") );
-                     
-                    //Add the employee and shift to the map
-                    currentWorkPairs.put(currentShift, currentEmployee);
                 }
                 //Add the generated map to the list of maps
                 dailySchedules.add(currentWorkPairs);
