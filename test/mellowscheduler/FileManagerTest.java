@@ -9,10 +9,12 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import org.junit.AfterClass;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import static org.junit.Assert.*;
 
 /**
  *
@@ -148,10 +150,9 @@ public class FileManagerTest {
         
         FileManager manager = new FileManager();
         
+        Schedule rereadSchedule = manager.parseScheduleJSON(manager.scheduleToJSON(testSchedule));
         
-        String correctString = "{\"daily schedules\":[{\"work pairs\":[[{\"end time\":\"1400\",\"start time\":\"0800\"},{\"first name\":\"Al\",\"hourly wage\":\"2.5\",\"Last name\":\"Bundy\",\"quality\":\"5\"}],[{\"end time\":\"2000\",\"start time\":\"1400\"},{\"first name\":\"Josh\",\"hourly wage\":\"5.0\",\"Last name\":\"Doe\",\"quality\":\"97\"}]]},{\"work pairs\":[[{\"end time\":\"1400\",\"start time\":\"0800\"},{\"first name\":\"Al\",\"hourly wage\":\"2.5\",\"Last name\":\"Bundy\",\"quality\":\"5\"}],[{\"end time\":\"2000\",\"start time\":\"1400\"},{\"first name\":\"Josh\",\"hourly wage\":\"5.0\",\"Last name\":\"Doe\",\"quality\":\"97\"}]]},{\"work pairs\":[[{\"end time\":\"2000\",\"start time\":\"1400\"},{\"first name\":\"Josh\",\"hourly wage\":\"5.0\",\"Last name\":\"Doe\",\"quality\":\"97\"}],[{\"end time\":\"1400\",\"start time\":\"0800\"},{\"first name\":\"Al\",\"hourly wage\":\"2.5\",\"Last name\":\"Bundy\",\"quality\":\"5\"}]]},{\"work pairs\":[[{\"end time\":\"1400\",\"start time\":\"0800\"},{\"first name\":\"Al\",\"hourly wage\":\"2.5\",\"Last name\":\"Bundy\",\"quality\":\"5\"}],[{\"end time\":\"2000\",\"start time\":\"1400\"},{\"first name\":\"Josh\",\"hourly wage\":\"5.0\",\"Last name\":\"Doe\",\"quality\":\"97\"}]]},{\"work pairs\":[[{\"end time\":\"2000\",\"start time\":\"1400\"},{\"first name\":\"Josh\",\"hourly wage\":\"5.0\",\"Last name\":\"Doe\",\"quality\":\"97\"}],[{\"end time\":\"1400\",\"start time\":\"0800\"},{\"first name\":\"Al\",\"hourly wage\":\"2.5\",\"Last name\":\"Bundy\",\"quality\":\"5\"}]]},{\"work pairs\":[[{\"end time\":\"2000\",\"start time\":\"1400\"},{\"first name\":\"Josh\",\"hourly wage\":\"5.0\",\"Last name\":\"Doe\",\"quality\":\"97\"}],[{\"end time\":\"1400\",\"start time\":\"0800\"},{\"first name\":\"Al\",\"hourly wage\":\"2.5\",\"Last name\":\"Bundy\",\"quality\":\"5\"}]]},{\"work pairs\":[[{\"end time\":\"1400\",\"start time\":\"0800\"},{\"first name\":\"Al\",\"hourly wage\":\"2.5\",\"Last name\":\"Bundy\",\"quality\":\"5\"}],[{\"end time\":\"2000\",\"start time\":\"1400\"},{\"first name\":\"Josh\",\"hourly wage\":\"5.0\",\"Last name\":\"Doe\",\"quality\":\"97\"}]]}]}";
-        
-        assertEquals(correctString, manager.scheduleToJSON(testSchedule).toJSONString());
+        assertTrue( rereadSchedule.equals(testSchedule) );
         
     }    
 
@@ -180,19 +181,8 @@ public class FileManagerTest {
         
         Schedule readSchedule = manager.JSONScheduleReader("testFiles/PermaSchedule");
         
-        ArrayList<Map<Shift, Employee>> readInWeek = readSchedule.getSchedule();
         
-        for(int ii = 0; ii < 7; ii++)
-        {
-            if(readInWeek.get(ii).equals(weeklySchedule.get(ii)))
-            {
-                assertTrue(true);
-            }
-            else
-            {
-                assertTrue(false);
-            }
-        }
+        assertTrue( readSchedule.equals(testSchedule));
         
         
     }

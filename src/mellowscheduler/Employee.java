@@ -95,4 +95,16 @@ public class Employee {
         
         return returnString;
     }
+    
+    
+    //Overloads the equals operator to allow comparison of employees
+    @Override
+    public boolean equals(Object obj)
+    {
+
+        Employee a = (Employee) obj;
+        
+        return this.firstName.equals(a.getFirstName())
+                && this.lastName.equals(a.getLastName());
+    }
 }

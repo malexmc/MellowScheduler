@@ -38,4 +38,13 @@ public class Shift {
     {
         endTime = newEndTime;
     }
+    
+    @Override
+    public boolean equals(Object obj)
+    {
+        Shift a = (Shift) obj;
+        
+        return this.startTime.equals(a.getStartTime())
+               && this.endTime.equals(a.getEndTime());
+    }
 }
