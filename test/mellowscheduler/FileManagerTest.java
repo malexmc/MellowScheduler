@@ -7,9 +7,6 @@ package mellowscheduler;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
 import org.junit.AfterClass;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -25,53 +22,6 @@ public class FileManagerTest {
     public FileManagerTest() {
     }
     
-    //Used to make an employee with all fields set
-    public Employee makeAlBundy()
-    {
-         Employee alBundy = new Employee();
-        
-        alBundy.setFirstName("Al");
-        alBundy.setLastName("Bundy");
-        alBundy.setHourlyWage(2.50);
-        alBundy.setQuality(5);
-        
-        return alBundy;
-    }
-    
-      //Used to make an employee with all fields set
-    public Employee makeJohnDoe()
-    {
-         Employee johnDoe = new Employee();
-        
-        johnDoe.setFirstName("Josh");
-        johnDoe.setLastName("Doe");
-        johnDoe.setHourlyWage(5.0);
-        johnDoe.setQuality(97);
-        
-        return johnDoe;
-    }
-    
-    //Makes Opening Shift with times filled out.
-    public Shift makeOpeningShift()
-    {
-        Shift openingShift =  new Shift();
-        
-        openingShift.setStartTime("0800");
-        openingShift.setEndTime("1400");
-        
-        return openingShift;
-    }
-    
-        //Makes Closing Shift with times filled out.
-    public Shift makeClosingShift()
-    {
-        Shift closingShift =  new Shift();
-        
-        closingShift.setStartTime("1400");
-        closingShift.setEndTime("2000");
-        
-        return closingShift;
-    }
     
     
     @BeforeClass
@@ -104,7 +54,7 @@ public class FileManagerTest {
         FileManager instance = new FileManager();
         
         
-        assertEquals(correctString, instance.employeesToJSON( makeAlBundy(), "Bundy").toJSONString());
+        assertEquals(correctString, instance.employeesToJSON( TestDataMaker.makeAlBundy(), "Bundy").toJSONString());
         
         //Clean up Bundy file after
         if (f.exists())
@@ -122,7 +72,7 @@ public class FileManagerTest {
         FileManager manager = new FileManager();
         employees = manager.JSONReader(employees, fileName);
         
-        Employee bundy = makeAlBundy();
+        Employee bundy = TestDataMaker.makeAlBundy();
         
         assertEquals(bundy.getFirstName(), employees.get(0).getFirstName());
         assertEquals(bundy.getLastName(), employees.get(0).getLastName());
@@ -133,20 +83,8 @@ public class FileManagerTest {
     
     @Test
     public void testScheduleToJSON() {
-        //Make synthetic schedule 
-        
-        Schedule testSchedule = new Schedule();
-        
-        ArrayList<Map<Shift, Employee>> weeklySchedule = new ArrayList<>();
-        
-        for(int ii = 0; ii < 7; ii++)
-        {
-            Map<Shift, Employee> oneDaySchedule = new HashMap<>();
-            oneDaySchedule.put(makeOpeningShift(), makeAlBundy());
-            oneDaySchedule.put(makeClosingShift(), makeJohnDoe());
-            weeklySchedule.add(oneDaySchedule);
-        }
-        testSchedule.setSchedule(weeklySchedule);
+
+        Schedule testSchedule = TestDataMaker.makeGenericSchedule();
         
         FileManager manager = new FileManager();
         
@@ -156,25 +94,12 @@ public class FileManagerTest {
         
     }    
 
+    
     @Test
     public void testJSONScheduleReader()
     {
      
-        //Make synthetic schedule 
-        
-        Schedule testSchedule = new Schedule();
-        
-        ArrayList<Map<Shift, Employee>> weeklySchedule = new ArrayList<>();
-        
-        for(int ii = 0; ii < 7; ii++)
-        {
-            Map<Shift, Employee> oneDaySchedule = new HashMap<>();
-            oneDaySchedule.put(makeOpeningShift(), makeAlBundy());
-            oneDaySchedule.put(makeClosingShift(), makeJohnDoe());
-            weeklySchedule.add(oneDaySchedule);
-        }
-        
-        testSchedule.setSchedule(weeklySchedule);
+        Schedule testSchedule = TestDataMaker.makeGenericSchedule();
         
         //Compare to read in test schedule
         FileManager manager = new FileManager();

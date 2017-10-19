@@ -47,6 +47,82 @@ public class Schedule {
         name = newName;
     }
     
+    public ArrayList<Employee> getScheduledEmployees()
+    {
+        ArrayList<Employee> uniqueEmployees = new ArrayList<>();
+        
+        ArrayList<Map<Shift, Employee>> innerSchedule = this.getSchedule();
+        
+        //For each day in the schedules...
+        for (int ii = 0; ii < 7; ii++)
+        {
+            //Get the map for the current day
+            Map<Shift, Employee> currentDay = innerSchedule.get(ii);
+            
+            //Get all the keys and their values and store in separate arrays.
+            Iterator<Shift> shiftIterator = currentDay.keySet().iterator();
+            
+            while( shiftIterator.hasNext() )
+            {
+                Shift currentShift = shiftIterator.next();
+                Employee currentEmployee = currentDay.get(currentShift);
+                
+                
+                boolean unique = true;
+                
+                //For all employees in the unique list
+                for(Employee listEmployee : uniqueEmployees)
+                {
+                    //If the current employee matches one in the list, it's not unique.
+                    if( listEmployee.equals( currentEmployee ) )
+                    {
+                        unique = false;
+                        break;
+                    }
+                }
+                
+                //If the employee is unique, add him/her to list!
+                if (unique == true)
+                {
+                    uniqueEmployees.add(currentEmployee);
+                }
+            }
+        }
+        
+        
+        return uniqueEmployees;
+    }
+    
+    public int getEmployeeWeeklyMinutes(Employee employee)
+    {
+        int minutes = 0;
+        
+        ArrayList<Map<Shift, Employee>> innerSchedule = this.getSchedule();
+        
+        //For each day in the schedules...
+        for (int ii = 0; ii < 7; ii++)
+        {
+            //Get the map for the current day
+            Map<Shift, Employee> currentDay = innerSchedule.get(ii);
+            
+            //Get all the keys and their values and store in separate arrays.
+            Iterator<Shift> shiftIterator = currentDay.keySet().iterator();
+            
+            while( shiftIterator.hasNext() )
+            {
+                Shift currentShift = shiftIterator.next();
+                
+                //If this shift is mapped to the employee we're looking for, then add its duration to the schedule
+                if (employee.equals(currentDay.get(currentShift)))
+                {
+                    minutes += ( (currentShift.timeToMinutes(currentShift.getEndTime()) - currentShift.timeToMinutes(currentShift.getStartTime()) ) );
+                }
+            }
+        }
+            
+        return minutes;
+    }
+    
     @Override
     public boolean equals(Object obj)
     {

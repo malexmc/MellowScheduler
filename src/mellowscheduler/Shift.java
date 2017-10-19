@@ -39,6 +39,14 @@ public class Shift {
         endTime = newEndTime;
     }
     
+    public int timeToMinutes(String time)
+    {
+               //Parse first to chars as hours. *60 to get mins. Parse second pair of chars as minutes. Add together to get total mins      
+        int hours = (Integer.parseInt( time.substring(0, 2) ) *60 );
+        int minutes = Integer.parseInt ( time.substring(2,4) );
+        return (hours + minutes);
+    }
+    
     @Override
     public boolean equals(Object obj)
     {
