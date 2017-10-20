@@ -5,6 +5,7 @@
  */
 package mellowscheduler;
 
+import mellowscheduler.Constraints.WeeklyHoursConstraint;
 import org.junit.AfterClass;
 import static org.junit.Assert.assertFalse;
 import org.junit.BeforeClass;
@@ -14,9 +15,9 @@ import static org.junit.Assert.assertTrue;
  *
  * @author Alex
  */
-public class MinWeeklyHoursConstraintTest {
+public class WeeklyHoursConstraintTest {
     
-    public MinWeeklyHoursConstraintTest() {
+    public WeeklyHoursConstraintTest() {
     }
     
     @BeforeClass
@@ -35,7 +36,7 @@ public class MinWeeklyHoursConstraintTest {
         
         Schedule testSchedule = TestDataMaker.makeOvertimeSchedule();
         
-        MinWeeklyHoursConstraint noLessThanFourty = new MinWeeklyHoursConstraint();
+        WeeklyHoursConstraint noLessThanFourty = new WeeklyHoursConstraint();
         
         noLessThanFourty.setHours(40);
         
@@ -47,7 +48,7 @@ public class MinWeeklyHoursConstraintTest {
         
         Schedule testSchedule = TestDataMaker.makeUndertimeSchedule();
         
-        MinWeeklyHoursConstraint noLessThanFourty = new MinWeeklyHoursConstraint();
+        WeeklyHoursConstraint noLessThanFourty = new WeeklyHoursConstraint();
         
         noLessThanFourty.setHours(40);
         

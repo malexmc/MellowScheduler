@@ -101,7 +101,12 @@ public class Employee {
     @Override
     public boolean equals(Object obj)
     {
-
+        //If the passed in object is null, it can never be equal to our object
+        if(obj == null)
+        {
+            return false;
+        }
+        
         Employee a = (Employee) obj;
         
         return this.firstName.equals(a.getFirstName())

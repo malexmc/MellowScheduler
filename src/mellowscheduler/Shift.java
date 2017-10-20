@@ -50,6 +50,12 @@ public class Shift {
     @Override
     public boolean equals(Object obj)
     {
+        //If parameter object is null, it can never be equal to our Shift
+        if(obj == null)
+        {
+            return false;
+        }
+        
         Shift a = (Shift) obj;
         
         return this.startTime.equals(a.getStartTime())

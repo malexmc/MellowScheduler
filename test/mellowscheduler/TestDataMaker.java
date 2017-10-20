@@ -140,4 +140,36 @@ public class TestDataMaker {
         return testSchedule;
     }
     
+    public static Schedule makeUnderstaffedSchedule()
+    {
+        //Make generic schedule 
+        
+        Schedule testSchedule = new Schedule();
+        
+        ArrayList<Map<Shift, Employee>> weeklySchedule = new ArrayList<>();
+        
+        for(int ii = 0; ii < 7; ii++)
+        {
+            if (ii == 0)
+            {
+                Map<Shift, Employee> oneDaySchedule = new HashMap<>();
+                oneDaySchedule.put(makeOpeningShift(), makeAlBundy());
+                oneDaySchedule.put(makeClosingShift(), null);
+                weeklySchedule.add(oneDaySchedule);                
+            }
+            else
+            {
+                Map<Shift, Employee> oneDaySchedule = new HashMap<>();
+                oneDaySchedule.put(makeOpeningShift(), makeAlBundy());
+                oneDaySchedule.put(makeClosingShift(), makeJohnDoe());
+                weeklySchedule.add(oneDaySchedule);
+            }
+            
+        }
+        
+        testSchedule.setSchedule(weeklySchedule);
+        
+        return testSchedule;
+    }
+    
 }

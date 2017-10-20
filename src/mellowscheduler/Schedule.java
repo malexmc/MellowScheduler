@@ -126,6 +126,13 @@ public class Schedule {
     @Override
     public boolean equals(Object obj)
     {
+        //If parameter object is null, it can never be equal to our Schedule
+        if(obj == null)
+        {
+            return false;
+        }
+        
+        
         Schedule a = (Schedule) obj;
         ArrayList<Map<Shift, Employee>> aInnerSchedule = a.getSchedule();
         
@@ -200,7 +207,7 @@ public class Schedule {
         return true;
     }
         
-    public void makeSchedule()
+    public void makeSchedule(ArrayList<Constraint> constraints, ArrayList<Shift> shifts)
     {
         //Take in constraints
         //Take in employees
