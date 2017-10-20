@@ -111,4 +111,15 @@ public class FileManagerTest {
         
         
     }
+
+    @Test
+    public void makeAllTestEmployeesFile()
+    {
+        FileManager manager = new FileManager();
+        String fileName = "testFiles/TestEmployees";
+        manager.JSONWriter(TestDataMaker.makeAlBundy(), fileName);
+        manager.JSONWriter(TestDataMaker.makeJohnDoe(), fileName);
+        manager.JSONWriter(TestDataMaker.makeBillyOvertime(), fileName);
+    }
+    
 }

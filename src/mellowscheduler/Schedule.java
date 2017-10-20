@@ -6,9 +6,12 @@
 package mellowscheduler;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import mellowscheduler.Constraints.Constraint;
+import mellowscheduler.Constraints.EmployeeAvailabilityConstraint;
 
 /**
  * Holds a weekly schedule consisting of a list of dictionaries of employees and the shifts they fill
@@ -45,6 +48,24 @@ public class Schedule {
     public void setName(String newName)
     {
         name = newName;
+    }
+    
+    public boolean shiftOverlaps(Shift shift1, Shift shift2)
+    {
+        Integer shiftOneStart = shift1.timeToMinutes(shift1.getStartTime());
+        Integer shiftOneEnd = shift1.timeToMinutes(shift1.getEndTime());
+        Integer shiftTwoStart = shift1.timeToMinutes(shift2.getStartTime());
+        Integer shiftTwoEnd = shift1.timeToMinutes(shift2.getEndTime())        ;
+        
+        // If shift one starts or ends in the middle of shift two, then it overlaps
+        if ( ( (shiftOneStart - shiftTwoStart) >= 0) && ((shiftOneStart - shiftTwoEnd) <= 0) 
+             || 
+             ((shiftOneEnd - shiftTwoStart) >= 0) &&  ((shiftOneEnd - shiftTwoEnd) <= 0)
+            )
+        {
+            return true;
+        }
+        return false;
     }
     
     public ArrayList<Employee> getScheduledEmployees()
@@ -207,22 +228,72 @@ public class Schedule {
         return true;
     }
         
-    public void makeSchedule(ArrayList<Constraint> constraints, ArrayList<Shift> shifts)
+    public void makeSchedule(ArrayList<Constraint> constraints, ArrayList<Shift> shifts, ArrayList<Employee> employees)
     {
         //Take in constraints
         //Take in employees
         //Take in shifts
         
-        //For each day...
-            //For each shift, save all employees that can work it based on availability constraints
-            //Place all shift arrays into a larger array for the day
+        //While we don't have a good schedule
+        while(true)
+        {
+            //Make blank schedule
+            Schedule newSchedule = new Schedule();
+            ArrayList<Map<Shift, Employee>> innerSchedule = newSchedule.getSchedule();
         
-        //Move through day -> shift-employee arrays
-            //If employee can be added to a shift, and doesn't have an overlapping shift, schedule him/her
-        
-        //Once all shifts are added, file through days to make sure other constraints are met
-        
-        //If shift is all good, return it.
-        
+            //For each day...
+            for(int ii = 0; ii < 7; ii++)
+            {
+                Map<Shift, Employee> dailySchedule = new HashMap<>();
+                
+                ArrayList<ArrayList<Employee>> allShiftAvailableEmployees = new ArrayList<>();
+                Map<Employee, Shift> works = new HashMap<>();
+                EmployeeAvailabilityConstraint available = new EmployeeAvailabilityConstraint();
+                
+                //For each shift, save all employees that can work it based on availability constraints
+                for (Shift currentShift : shifts)
+                {
+                    ArrayList<Employee> availableEmployees = new ArrayList<>();
+                    for(Employee currentEmployee : employees)
+                    {
+                        if(available.satisfied(newSchedule))
+                        {
+                            availableEmployees.add(currentEmployee);
+                        }
+                    }
+                    allShiftAvailableEmployees.add(availableEmployees);
+                }
+                
+            //Move through day -> shift-employee arrays
+                for(int jj = 0; jj < allShiftAvailableEmployees.size(); jj++)
+                {
+                    //If employee can be added to a shift, and doesn't have an overlapping shift, schedule him/her
+                    Shift currentShift = shifts.get(jj);
+                    for(Employee currentEmployee : allShiftAvailableEmployees.get(jj))
+                    {
+                        boolean isWorking = false;
+                        for(Employee workingEmployee : works.keySet())
+                        {
+                            if(workingEmployee.equals(currentEmployee))
+                            {
+                                isWorking = true;
+                            }
+                        }
+                        
+                        if(isWorking = true)
+                        {
+                            
+                        }
+                    }
+
+                }
+
+            //Once all shifts are added, file through days to make sure other constraints are met
+
+            //If shift is all good, return it.
+            }
+
+        }
+
     }
 }

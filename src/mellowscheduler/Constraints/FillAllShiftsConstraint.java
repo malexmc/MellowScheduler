@@ -18,9 +18,14 @@ import mellowscheduler.Shift;
  */
 public class FillAllShiftsConstraint implements Constraint{
     
+    
+    //Param: Expects a Schedule object
     @Override
-    public boolean satisfied(Schedule constrainedSchedule)
+    public boolean satisfied(Object obj)
+            
     {
+        
+        Schedule constrainedSchedule = (Schedule) obj;
         
         ArrayList<Map<Shift, Employee>> innerSchedule = constrainedSchedule.getSchedule();
         

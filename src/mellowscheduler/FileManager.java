@@ -158,10 +158,12 @@ public class FileManager {
                  try 
                  {
                     FileWriter employeeWriteHandle = new FileWriter("./" + fileName + ".JSON", false );
+                    String wtf = employeesJSON.toJSONString();
                     employeeWriteHandle.write(employeesJSON.toJSONString());    
                  }
                  catch(Exception e)
                  {
+                     e.printStackTrace();
                  }
         }
             
@@ -338,4 +340,7 @@ public class FileManager {
         }
         return null;
     }
+    
 }
+
+

@@ -45,8 +45,12 @@ public class WeeklyHoursConstraint implements Constraint{
     
     // Checks that constraint is satisfied when applied to all employees
     @Override
-    public boolean satisfied(Schedule constrainedSchedule)
+    public boolean satisfied(Object obj)
+            
     {
+        
+        Schedule constrainedSchedule = (Schedule) obj;
+        
         // For each employee
         for (Employee currentEmployee : constrainedSchedule.getScheduledEmployees())
         {

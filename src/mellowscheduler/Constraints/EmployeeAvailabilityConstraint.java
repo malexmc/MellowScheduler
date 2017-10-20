@@ -11,8 +11,13 @@ import mellowscheduler.Schedule;
  *
  * @author Alex
  */
-public interface Constraint {
+public class EmployeeAvailabilityConstraint implements Constraint{
     
-    boolean satisfied(Object obj);
+    
+    //TODO: Actually implement this.
+    public boolean satisfied(Object obj)
+    {
+        return true;
+    }
     
 }
