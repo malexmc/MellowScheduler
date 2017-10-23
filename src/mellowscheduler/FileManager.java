@@ -219,7 +219,7 @@ public class FileManager {
         } 
         catch (ParseException e)
         {
-            System.out.print("Fle: ./" + fileName + ".JSON contains bad JSON data.");
+            System.out.print("File: ./" + fileName + ".JSON contains bad JSON data.");
         }
 
         if (obj != null)

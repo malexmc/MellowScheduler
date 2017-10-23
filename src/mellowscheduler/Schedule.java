@@ -6,9 +6,13 @@
 package mellowscheduler;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 import mellowscheduler.Constraints.Constraint;
 import mellowscheduler.Constraints.EmployeeAvailabilityConstraint;
@@ -24,7 +28,6 @@ public class Schedule {
     //Default constructor
     public Schedule()
     {
-        scheduleWeek = new ArrayList<>();
         name = "";
     }
     
@@ -37,6 +40,37 @@ public class Schedule {
     public String getName()
     {
         return name;
+    }
+    
+    public String getPrintableString()
+    {
+        String printString = "";
+        printString += "+++++++++++++++++++++++++\n";
+        if(scheduleWeek == null)
+        {
+            printString += "Schedule is blank\n";
+            return printString;
+        }
+        
+        ArrayList<String> days = new ArrayList<>(Arrays.asList("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"));
+        
+        for(int ii = 0; ii < 7; ii++)
+        {
+            printString += "Day: " + days.get(ii) + "\n";
+            Map<Shift, Employee> currentMap = scheduleWeek.get(ii);
+            for (Shift currentShift :  currentMap.keySet())
+            {
+                Employee currentEmployee = currentMap.get(currentShift);
+                
+                printString += "    " + currentEmployee.getFirstName() + " " + currentEmployee.getLastName() + " works " + currentShift.getStartTime() + "-" + currentShift.getEndTime() + "\n";
+            }
+            
+            printString += "\n";
+
+        }
+        
+        printString += "+++++++++++++++++++++++++\n";
+        return printString;
     }
     
     //Set the schedule
@@ -228,28 +262,35 @@ public class Schedule {
         return true;
     }
         
-    public void makeSchedule(ArrayList<Constraint> constraints, ArrayList<Shift> shifts, ArrayList<Employee> employees)
+    public void makeSchedule(ArrayList<Constraint> constraints, ArrayList<Shift> shifts, ArrayList<Employee> employees) throws Exception
     {
-        //Take in constraints
-        //Take in employees
-        //Take in shifts
-        
-        //While we don't have a good schedule
-        while(true)
+        int x = 0;
+        while(x < 100)
         {
+            //shuffle all arrays to make our schedule somewhat random
+            long seed = System.nanoTime();
+            Collections.shuffle(constraints, new Random(seed));
+
+            seed = System.nanoTime();
+            Collections.shuffle(shifts, new Random(seed));
+
+            seed = System.nanoTime();
+            Collections.shuffle(employees, new Random(seed));
+
+
             //Make blank schedule
             Schedule newSchedule = new Schedule();
-            ArrayList<Map<Shift, Employee>> innerSchedule = newSchedule.getSchedule();
-        
+            ArrayList<Map<Shift, Employee>> innerSchedule = new ArrayList<>();
+
             //For each day...
             for(int ii = 0; ii < 7; ii++)
             {
                 Map<Shift, Employee> dailySchedule = new HashMap<>();
-                
+
                 ArrayList<ArrayList<Employee>> allShiftAvailableEmployees = new ArrayList<>();
                 Map<Employee, Shift> works = new HashMap<>();
                 EmployeeAvailabilityConstraint available = new EmployeeAvailabilityConstraint();
-                
+
                 //For each shift, save all employees that can work it based on availability constraints
                 for (Shift currentShift : shifts)
                 {
@@ -263,37 +304,77 @@ public class Schedule {
                     }
                     allShiftAvailableEmployees.add(availableEmployees);
                 }
-                
+
             //Move through day -> shift-employee arrays
                 for(int jj = 0; jj < allShiftAvailableEmployees.size(); jj++)
                 {
                     //If employee can be added to a shift, and doesn't have an overlapping shift, schedule him/her
+
+                    //Get the current shift
                     Shift currentShift = shifts.get(jj);
+
+                    //For every employee available for currentShift...
                     for(Employee currentEmployee : allShiftAvailableEmployees.get(jj))
                     {
-                        boolean isWorking = false;
+                        boolean alreadyCommitted = false;
+
+                        //for each employee currently working...
                         for(Employee workingEmployee : works.keySet())
                         {
+
+                            //If current employee is working...
                             if(workingEmployee.equals(currentEmployee))
                             {
-                                isWorking = true;
+                                //check if the shift overlaps with the current shift
+                                if (newSchedule.shiftOverlaps(works.get(workingEmployee), currentShift))
+                                {
+                                    alreadyCommitted = true;
+                                }
+
                             }
                         }
-                        
-                        if(isWorking = true)
+
+                        //If employee is free that day, add the shift.
+                        if(alreadyCommitted == false)
                         {
-                            
+                            works.put(currentEmployee, currentShift);
+                            dailySchedule.put(currentShift, currentEmployee);
+                            break;
                         }
                     }
 
                 }
 
-            //Once all shifts are added, file through days to make sure other constraints are met
-
-            //If shift is all good, return it.
+                //Add this day's map to the schedule
+                innerSchedule.add(dailySchedule);
             }
-
+            newSchedule.setSchedule(innerSchedule);
+            
+            //Iterate through constraints and check if schedule is good
+            boolean goodSchedule = true;
+            for(Constraint currentConstraint : constraints)
+            {
+                if(currentConstraint.satisfied(newSchedule) == false)
+                {
+                    goodSchedule = false;
+                    break;
+                }
+            }
+            
+            //If schedule is good, set the schedule leave this god-forsaken loop
+            if(goodSchedule)
+            {
+                setSchedule(innerSchedule);
+                break;
+            }
+            
+            //Increment X
+            x++;
         }
-
+        
+        if(getSchedule() == null)
+        {
+            throw new Exception();
+        }
     }
 }

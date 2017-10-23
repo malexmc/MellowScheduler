@@ -22,7 +22,6 @@ public class FillAllShiftsConstraint implements Constraint{
     //Param: Expects a Schedule object
     @Override
     public boolean satisfied(Object obj)
-            
     {
         
         Schedule constrainedSchedule = (Schedule) obj;

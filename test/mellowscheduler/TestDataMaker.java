@@ -33,7 +33,7 @@ public class TestDataMaker {
     {
          Employee johnDoe = new Employee();
         
-        johnDoe.setFirstName("Josh");
+        johnDoe.setFirstName("John");
         johnDoe.setLastName("Doe");
         johnDoe.setHourlyWage(5.0);
         johnDoe.setQuality(97);
