@@ -6,6 +6,7 @@
 package mellowscheduler;
 
 import java.util.ArrayList;
+import java.util.Map;
 
 /**
  *
@@ -17,6 +18,7 @@ public class Employee {
     private String lastName;
     private Double hourlyWage;
     private Integer quality;
+    private ArrayList<ArrayList<Shift>> unavailable;
     //private Shift commonShift
     
     public Employee(){
@@ -24,6 +26,14 @@ public class Employee {
         lastName = "";
         hourlyWage = 0.0;
         quality = 0;
+        unavailable = new ArrayList<>();
+        
+        for(int ii = 0; ii < 7; ii++)
+        {
+            ArrayList<Shift> shiftList = new ArrayList<>();
+            unavailable.add(shiftList);
+        }
+        
         
 //        ArrayList<Employee> employees = new ArrayList<>();
 //        FileManager fileManager = new FileManager();
@@ -56,6 +66,11 @@ public class Employee {
         quality = value;
     }
     
+    public void setUnavailable(ArrayList<ArrayList<Shift>> value)
+    {
+        this.unavailable = value;
+    }
+    
     
     //Member get functions
     public Integer getEmployeeID()
@@ -81,6 +96,11 @@ public class Employee {
     public Integer getQuality()
     {
         return quality;
+    }
+    
+    public ArrayList<ArrayList<Shift>> getUnavailable()
+    {
+        return unavailable;
     }
     
 
