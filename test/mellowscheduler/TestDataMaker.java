@@ -58,7 +58,7 @@ public class TestDataMaker {
             allShiftList.add(shiftList);
         }
         
-        alBundy.setUnavailable(allShiftList);
+        johnDoe.setUnavailable(allShiftList);
         
         return johnDoe;
     }

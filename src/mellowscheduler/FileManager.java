@@ -28,6 +28,7 @@ import org.json.simple.parser.ParseException;
  */
 public class FileManager {
     
+    
     //Makes sure the file a given directory exists
     private  boolean ensure_file_exist(String filePath )
     {
@@ -115,7 +116,7 @@ public class FileManager {
                     allUnavailabilities.add(currentDayJSON);
                 }
                 
-                newJSON.put("unavailability", allUnavailabilities);
+                newJSON.put("unavailable", allUnavailabilities);
                 
                 employeeJSONs.add(newJSON);
             }
@@ -185,7 +186,8 @@ public class FileManager {
                  {
                     FileWriter employeeWriteHandle = new FileWriter("./" + fileName + ".JSON", false );
                     String wtf = employeesJSON.toJSONString();
-                    employeeWriteHandle.write(employeesJSON.toJSONString());    
+                    employeeWriteHandle.write(employeesJSON.toJSONString());
+                    employeeWriteHandle.close();
                  }
                  catch(Exception e)
                  {
@@ -237,7 +239,7 @@ public class FileManager {
         }
         catch (FileNotFoundException e)
         {
-            System.out.print("Could not find file: ./" + fileName + ".JSON to read\nAssuming no employees exist." );
+            System.out.print("Could not find file: ./" + fileName + ".JSON to read. Assuming no employees exist.\n" );
         } 
         catch (IOException e)
         {
