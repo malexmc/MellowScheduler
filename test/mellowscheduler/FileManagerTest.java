@@ -49,12 +49,10 @@ public class FileManagerTest {
         }
         
         
-        String correctString = "{\"employees\":[{\"last name\":\"Bundy\",\"first name\":\"Al\",\"hourly wage"
-                                         + "\":\"2.5\",\"quality\":\"5\"}]}";
-        FileManager instance = new FileManager();
+        String correctString = "{\"employees\":[{\"last name\":\"Bundy\",\"first name\":\"Al\",\"hourly wage\":\"2.5\",\"unavailable\":[{\"shifts\":[{\"end time\":\"1400\",\"start time\":\"0800\"},{\"end time\":\"2000\",\"start time\":\"1400\"}]},{\"shifts\":[{\"end time\":\"1400\",\"start time\":\"0800\"},{\"end time\":\"2000\",\"start time\":\"1400\"}]},{\"shifts\":[{\"end time\":\"1400\",\"start time\":\"0800\"},{\"end time\":\"2000\",\"start time\":\"1400\"}]},{\"shifts\":[{\"end time\":\"1400\",\"start time\":\"0800\"},{\"end time\":\"2000\",\"start time\":\"1400\"}]},{\"shifts\":[{\"end time\":\"1400\",\"start time\":\"0800\"},{\"end time\":\"2000\",\"start time\":\"1400\"}]},{\"shifts\":[{\"end time\":\"1400\",\"start time\":\"0800\"},{\"end time\":\"2000\",\"start time\":\"1400\"}]},{\"shifts\":[{\"end time\":\"1400\",\"start time\":\"0800\"},{\"end time\":\"2000\",\"start time\":\"1400\"}]}],\"quality\":\"5\"}]}";
+        FileManager manager = new FileManager();
         
-        
-        assertEquals(correctString, instance.employeesToJSON( TestDataMaker.makeAlBundy(), "Bundy").toJSONString());
+        assertEquals(correctString, manager.employeesToJSON( TestDataMaker.makeAlBundy(), "Bundy").toJSONString());
         
         //Clean up Bundy file after
         if (f.exists())

@@ -11,6 +11,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -26,6 +27,7 @@ import org.json.simple.parser.ParseException;
  * @author Alex
  */
 public class FileManager {
+    
     
     //Makes sure the file a given directory exists
     private  boolean ensure_file_exist(String filePath )
@@ -91,6 +93,31 @@ public class FileManager {
                 newJSON.put("hourly wage", employeeToWrite.getHourlyWage().toString());
                 newJSON.put("quality", employeeToWrite.getQuality().toString());
 
+                
+                JSONArray allUnavailabilities = new JSONArray();
+                ArrayList< ArrayList<Shift>> unavailability = currentEmployee.getUnavailable();
+                for(int ii = 0; ii < 7; ii++)
+                {
+                    JSONObject currentDayJSON = new JSONObject();
+                    ArrayList<Shift> dayShifts = unavailability.get(ii);
+                    
+                    JSONArray dayShiftsJSON = new JSONArray();
+                    for(Shift currentShift : dayShifts)
+                    {
+                        JSONObject shiftJSON = new JSONObject();
+                        
+                        shiftJSON.put("start time", currentShift.getStartTime());
+                        shiftJSON.put("end time", currentShift.getEndTime());
+                        
+                        dayShiftsJSON.add(shiftJSON);
+                    }
+                    
+                    currentDayJSON.put("shifts", dayShiftsJSON);
+                    allUnavailabilities.add(currentDayJSON);
+                }
+                
+                newJSON.put("unavailable", allUnavailabilities);
+                
                 employeeJSONs.add(newJSON);
             }
 
@@ -159,7 +186,8 @@ public class FileManager {
                  {
                     FileWriter employeeWriteHandle = new FileWriter("./" + fileName + ".JSON", false );
                     String wtf = employeesJSON.toJSONString();
-                    employeeWriteHandle.write(employeesJSON.toJSONString());    
+                    employeeWriteHandle.write(employeesJSON.toJSONString());
+                    employeeWriteHandle.close();
                  }
                  catch(Exception e)
                  {
@@ -211,7 +239,7 @@ public class FileManager {
         }
         catch (FileNotFoundException e)
         {
-            System.out.print("Could not find file: ./" + fileName + ".JSON to read\nAssuming no employees exist." );
+            System.out.print("Could not find file: ./" + fileName + ".JSON to read. Assuming no employees exist.\n" );
         } 
         catch (IOException e)
         {
@@ -241,6 +269,43 @@ public class FileManager {
                 currentEmployee.setHourlyWage( Double.parseDouble( (String) currentEmployeeJSON.get("hourly wage") ) );
                 currentEmployee.setQuality( Integer.parseInt( (String) currentEmployeeJSON.get("quality") ) );
 
+                //For the unavailable daily Shift list...
+                JSONArray unavailableJSON = (JSONArray) currentEmployeeJSON.get("unavailable");
+                Iterator<JSONObject> unavailableIterator = unavailableJSON.iterator();
+                
+                //Make a List to store the daily shifts lists
+                ArrayList<ArrayList<Shift>> allShiftLists = new ArrayList<>();
+                
+                //Iterate over each day's list
+                while(unavailableIterator.hasNext())
+                {
+                    JSONObject currentDayJSON = (JSONObject) unavailableIterator.next();
+
+                    //For each day's list...
+                    ArrayList<Shift> shiftList = new ArrayList<>();
+                    JSONArray shiftArrayJSON = (JSONArray) currentDayJSON.get("shifts");
+                    Iterator<JSONObject> shiftsIterator = shiftArrayJSON.iterator();
+                    
+                    //Iterate over each shift
+                    while(shiftsIterator.hasNext())
+                    {
+                        //Get the Shift object JSON
+                        JSONObject shiftJSON = (JSONObject) shiftsIterator.next();
+                        Shift currentShift = new Shift();
+                        
+                        //Store in Shift object
+                        currentShift.setStartTime((String) shiftJSON.get("start time"));
+                        currentShift.setStartTime((String) shiftJSON.get("end time"));
+                        
+                        //Add shift to day's list
+                        shiftList.add(currentShift);
+                    }
+                    //Add day's list to week's list
+                    allShiftLists.add(shiftList);
+                }
+                
+                currentEmployee.setUnavailable(allShiftLists);
+                
                 employees.add(currentEmployee);
             }
         }

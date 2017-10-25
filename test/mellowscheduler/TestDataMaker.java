@@ -25,6 +25,18 @@ public class TestDataMaker {
         alBundy.setHourlyWage(2.50);
         alBundy.setQuality(5);
         
+        ArrayList<ArrayList<Shift>> allShiftList= new ArrayList<>();
+        for(int ii = 0; ii < 7; ii++)
+        {
+            ArrayList<Shift> shiftList = new ArrayList<>();
+            shiftList.add(makeOpeningShift());
+            shiftList.add(makeClosingShift());
+            
+            allShiftList.add(shiftList);
+        }
+        
+        alBundy.setUnavailable(allShiftList);
+        
         return alBundy;
     }
     
@@ -37,6 +49,16 @@ public class TestDataMaker {
         johnDoe.setLastName("Doe");
         johnDoe.setHourlyWage(5.0);
         johnDoe.setQuality(97);
+        
+        ArrayList<ArrayList<Shift>> allShiftList= new ArrayList<>();
+        for(int ii = 0; ii < 7; ii++)
+        {
+            ArrayList<Shift> shiftList = new ArrayList<>();
+            shiftList.add(makeOpeningShift());
+            allShiftList.add(shiftList);
+        }
+        
+        johnDoe.setUnavailable(allShiftList);
         
         return johnDoe;
     }
