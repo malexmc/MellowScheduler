@@ -26,6 +26,7 @@ public class FileManagerTest {
     
     @BeforeClass
     public static void setUpClass() {
+        TestDataMaker.makeAllTestEmployeesFile();
     }
     
     @AfterClass
@@ -108,16 +109,6 @@ public class FileManagerTest {
         assertTrue( readSchedule.equals(testSchedule));
         
         
-    }
-
-    @Test
-    public void makeAllTestEmployeesFile()
-    {
-        FileManager manager = new FileManager();
-        String fileName = "testFiles/TestEmployees";
-        manager.JSONWriter(TestDataMaker.makeAlBundy(), fileName);
-        manager.JSONWriter(TestDataMaker.makeJohnDoe(), fileName);
-        manager.JSONWriter(TestDataMaker.makeBillyOvertime(), fileName);
     }
     
 }

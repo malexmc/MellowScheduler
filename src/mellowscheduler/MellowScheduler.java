@@ -16,6 +16,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
@@ -34,26 +35,41 @@ public class MellowScheduler extends Application {
         grid.setVgap(10);
         grid.setPadding(new Insets(25, 25, 25, 25));
 
-        Text scenetitle = new Text("Welcome");
+        Text scenetitle = new Text("Mellow Scheduler");
         scenetitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
         grid.add(scenetitle, 0, 0, 2, 1);
 
-        //Created button and gives it style
-        Button btn = new Button("Sign in");
+        //Create Employee button
+        Button employeeButton = new Button("Employees");
+        
+        //Create Schedule button
+        Button scheduleButton = new Button("Schedules");
+        
+        //Make HBox to hold buttons and place them in horizontal row.
         HBox hbBtn = new HBox(10);
-        hbBtn.setAlignment(Pos.BOTTOM_RIGHT);
-        hbBtn.getChildren().add(btn);
+        hbBtn.setAlignment(Pos.BOTTOM_LEFT);
+        hbBtn.getChildren().add(employeeButton);
+        hbBtn.getChildren().add(scheduleButton);
         grid.add(hbBtn, 1, 4);
 
         //Text to be displayed. Will do nothing for now.
         final Text actiontarget = new Text();
         grid.add(actiontarget, 1, 6);
 
-        //Handler for button.
-        btn.setOnAction(new EventHandler<ActionEvent>() {
+        //Handler for Employee button.
+        employeeButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent e) {
                 swapScene(sceneNames.NEW_EMPLOYEE, primaryStage);
+            }
+        });
+        
+        //Handler for button.
+        scheduleButton.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            //TODO: Implement this when it's time for the scheduler page
+            public void handle(ActionEvent e) {
+                //swapScene(sceneNames.NEW_EMPLOYEE, primaryStage);
             }
         });
 
@@ -70,53 +86,64 @@ public class MellowScheduler extends Application {
         scenetitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
 
         //Make sure grid has enough rows to accomodate the fields for the employee
-        grid.add(scenetitle, 0, 0, 1, 1);
-
+        //Place scene title in 4th column, 1st row with span of 1 cell right and down
+        grid.add(scenetitle, 4, 0, 1, 1);
+        
+        //Make vertical boxes to help align text fields and descriptive test
+        VBox fieldDescription = new VBox();
+        fieldDescription.setAlignment(Pos.TOP_LEFT);
+        fieldDescription.setPadding(new Insets(5, 0, 5, 0));
+        
+        VBox textFields = new VBox();
+        textFields.setAlignment(Pos.TOP_RIGHT);
+        textFields.setPadding(new Insets(5, 0, 5, 0));
+        
+        
         //Employee first name
         Label firstName = new Label("Employee First Name:");
-        grid.add(firstName, 0, 1);
+        fieldDescription.getChildren().add(firstName);
 
         TextField firstNameTextField = new TextField();
-        grid.add(firstNameTextField, 1, 1);
+        textFields.getChildren().add(firstNameTextField);
 
         //Employee last name
         Label lastName = new Label("Employee Last Name:");
-        grid.add(lastName, 0, 2);
+        fieldDescription.getChildren().add(lastName);
 
         TextField lastNameTextField = new TextField();
-        grid.add(lastNameTextField, 1, 2);
+        textFields.getChildren().add(lastNameTextField);
 
         //Employee hourly wage
         Label hourlyWage = new Label("Employee Hourly Wage:");
-        grid.add(hourlyWage, 0, 3);
+        fieldDescription.getChildren().add(hourlyWage);
 
         TextField hourlyWageTextField = new TextField();
-        grid.add(hourlyWageTextField, 1, 3);
+        textFields.getChildren().add(hourlyWageTextField);
 
         //Employee quality
         Label quality = new Label("Employee Quality:");
-        grid.add(quality, 0, 4);
+        fieldDescription.getChildren().add(quality);
 
         TextField qualityTextField = new TextField();
-        grid.add(qualityTextField, 1, 4);
+        textFields.getChildren().add(qualityTextField);
 
         //Create save employee button
         Button saveButton = new Button("Save Employee");
-        HBox hbsaveButton = new HBox(10);
-        hbsaveButton.setAlignment(Pos.BOTTOM_RIGHT);
-        hbsaveButton.getChildren().add(saveButton);
-        grid.add(hbsaveButton, 1, 5);
+        saveButton.setAlignment(Pos.BOTTOM_RIGHT);
+        textFields.getChildren().add(saveButton);
 
         //Create back button.
         Button backButton = new Button("Back");
-        HBox hbbackButton = new HBox(10);
-        hbbackButton.setAlignment(Pos.BOTTOM_LEFT);
-        hbbackButton.getChildren().add(backButton);
-        grid.add(hbbackButton, 0, 5);
+        saveButton.setAlignment(Pos.BOTTOM_LEFT);
+        fieldDescription.getChildren().add(backButton);
+        
+        
+        grid.add(fieldDescription,4,3,1,1);
+        grid.add(textFields,5,3,1,2);
 
         //Text to be displayed. Will do nothing for now.
         final Text actiontarget = new Text();
-        grid.add(actiontarget, 1, 6);
+        grid.add(actiontarget, 5, 6);
 
         //Handler for save button.
         saveButton.setOnAction((ActionEvent e) -> {
@@ -158,7 +185,7 @@ public class MellowScheduler extends Application {
 
         //Scene code.
         //Give our scene the grid we have been building
-        Scene newScene = new Scene(grid, 300, 275);
+        Scene newScene = new Scene(grid, 889, 500);
         primaryStage.setScene(newScene);
         primaryStage.show();
     }
@@ -171,60 +198,6 @@ public class MellowScheduler extends Application {
         swapScene(sceneNames.START, primaryStage);
     }
 
-    /*   
-    public void newEmployee(Stage primaryStage)
-    {
-        //Stage is the big daddy for the whole application. Ours is primaryStage here.
-        primaryStage.setTitle("JavaFX Welcome");
-        GridPane grid = new GridPane();
-        grid.setAlignment(Pos.CENTER);
-        grid.setHgap(10);
-        grid.setVgap(10);
-        grid.setPadding(new Insets(25, 25, 25, 25));
-        
-        Text scenetitle = new Text("Welcome");
-        scenetitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
-        grid.add(scenetitle, 0, 0, 2, 1);
-
-        
-        //Username field
-        Label userName = new Label("User Name:");
-        grid.add(userName, 0, 1);
-
-        TextField userTextField = new TextField();
-        grid.add(userTextField, 1, 1);
-
-        Label pw = new Label("Password:");
-        grid.add(pw, 0, 2);
-
-
-        //Created button and gives it style
-        Button btn = new Button("Sign in");
-        HBox hbBtn = new HBox(10);
-        hbBtn.setAlignment(Pos.BOTTOM_RIGHT);
-        hbBtn.getChildren().add(btn);
-        grid.add(hbBtn, 1, 4);
-        
-        //Text to be displayed. Will do nothing for now.
-        final Text actiontarget = new Text();
-        grid.add(actiontarget, 1, 6);
-        
-        //Handler for button.
-        btn.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent e) {
-                actiontarget.setFill(Color.FIREBRICK);
-                actiontarget.setText("Got 'eem!");
-            }
-        });
-        
-        //Scene code.
-        //Give our scene the grid we have been building
-        Scene scene = new Scene(grid, 300, 275);
-        primaryStage.setScene(scene);
-        primaryStage.show();
-    }
-     */
     public enum sceneNames {
         START,
         NEW_EMPLOYEE

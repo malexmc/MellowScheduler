@@ -129,7 +129,32 @@ public class Employee {
         
         Employee a = (Employee) obj;
         
+        for(int ii = 0; ii < 7; ii++)
+        {
+            ArrayList<Shift> thisUnavailableShiftsToday = this.getUnavailable().get(ii);
+            ArrayList<Shift> aUnavailableShiftsToday = a.getUnavailable().get(ii);
+            
+            for(Shift thisShift: thisUnavailableShiftsToday)
+            {
+                boolean matched = false;
+                for(Shift aShift : aUnavailableShiftsToday)
+                {
+                    if(aShift.equals(thisShift))
+                    {
+                        matched = true;
+                    }
+                }
+                if(matched == false)
+                {
+                    return false;
+                }
+            }
+            
+        }
+        
         return this.firstName.equals(a.getFirstName())
+                && this.quality.equals(a.getQuality())
+                && this.hourlyWage.equals(a.getHourlyWage())
                 && this.lastName.equals(a.getLastName());
     }
 }

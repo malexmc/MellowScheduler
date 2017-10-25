@@ -21,6 +21,7 @@ public class EmployeeTest {
     
     @BeforeClass
     public static void setUpClass() {
+        TestDataMaker.makeAllTestEmployeesFile();
     }
     
     @AfterClass

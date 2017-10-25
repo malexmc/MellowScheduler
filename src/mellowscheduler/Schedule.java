@@ -108,6 +108,11 @@ public class Schedule {
         
         ArrayList<Map<Shift, Employee>> innerSchedule = this.getSchedule();
         
+        if(innerSchedule == null)
+        {
+            return uniqueEmployees;
+        }
+        
         //For each day in the schedules...
         for (int ii = 0; ii < 7; ii++)
         {
@@ -128,11 +133,27 @@ public class Schedule {
                 //For all employees in the unique list
                 for(Employee listEmployee : uniqueEmployees)
                 {
-                    //If the current employee matches one in the list, it's not unique.
-                    if( listEmployee.equals( currentEmployee ) )
+
+                    //Since we can have null employees in the case of  unfilled shifts, have to manually look for that.
+                    if(currentEmployee == null)
                     {
-                        unique = false;
-                        break;
+                        if(listEmployee == null)
+                        {
+                            unique = false;
+                            break;                            
+                        }
+
+                    }
+                    
+                    //If the current employee matches one in the list, it's not unique.
+                    else if(listEmployee != null)
+                    {
+                        if ( listEmployee.equals( currentEmployee ) )
+                        {
+                            unique = false;
+                            break;                            
+                        }
+
                     }
                 }
                 
@@ -151,6 +172,12 @@ public class Schedule {
     public int getEmployeeWeeklyMinutes(Employee employee)
     {
         int minutes = 0;
+        
+        //If we found a null employee, they can't work :)
+        if(employee == null)
+        {
+            return 0;
+        }
         
         ArrayList<Map<Shift, Employee>> innerSchedule = this.getSchedule();
         
@@ -289,15 +316,23 @@ public class Schedule {
 
                 ArrayList<ArrayList<Employee>> allShiftAvailableEmployees = new ArrayList<>();
                 Map<Employee, Shift> works = new HashMap<>();
-                EmployeeAvailabilityConstraint available = new EmployeeAvailabilityConstraint();
 
-                //For each shift, save all employees that can work it based on availability constraints
-                for (Shift currentShift : shifts)
+                //For each shift, save all employees that can work it based on availability
+                for (Shift openShift : shifts)
                 {
                     ArrayList<Employee> availableEmployees = new ArrayList<>();
                     for(Employee currentEmployee : employees)
                     {
-                        if(available.satisfied(newSchedule))
+                        boolean available = true;
+                        for(Shift unavailableShift : currentEmployee.getUnavailable().get(ii))
+                        {
+                            if(unavailableShift.overlaps(openShift))
+                            {
+                                available = false;
+                                break;
+                            }
+                        }
+                        if(available)
                         {
                             availableEmployees.add(currentEmployee);
                         }
@@ -313,6 +348,7 @@ public class Schedule {
                     //Get the current shift
                     Shift currentShift = shifts.get(jj);
 
+                    boolean shiftAdded = false;
                     //For every employee available for currentShift...
                     for(Employee currentEmployee : allShiftAvailableEmployees.get(jj))
                     {
@@ -339,8 +375,16 @@ public class Schedule {
                         {
                             works.put(currentEmployee, currentShift);
                             dailySchedule.put(currentShift, currentEmployee);
+                            shiftAdded = true;
                             break;
                         }
+                    }
+                    
+                    //If we couldn't fill the shift, add null employee to map
+                    if(shiftAdded == false)
+                    {
+                        dailySchedule.put(currentShift, null);
+                        shiftAdded = true;
                     }
 
                 }
