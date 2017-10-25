@@ -8,9 +8,9 @@ package mellowscheduler;
 import mellowscheduler.Constraints.WeeklyHoursConstraint;
 import org.junit.AfterClass;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import static org.junit.Assert.assertTrue;
 /**
  *
  * @author Alex
@@ -22,6 +22,7 @@ public class WeeklyHoursConstraintTest {
     
     @BeforeClass
     public static void setUpClass() {
+        TestDataMaker.makeAllTestEmployeesFile();
     }
     
     @AfterClass

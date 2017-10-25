@@ -54,7 +54,7 @@ public class TestDataMaker {
         for(int ii = 0; ii < 7; ii++)
         {
             ArrayList<Shift> shiftList = new ArrayList<>();
-            shiftList.add(makeOpeningShift());
+            shiftList.add(new Shift("1000","1200"));
             allShiftList.add(shiftList);
         }
         
@@ -192,6 +192,15 @@ public class TestDataMaker {
         testSchedule.setSchedule(weeklySchedule);
         
         return testSchedule;
+    }
+    
+    public static void makeAllTestEmployeesFile()
+    {
+        FileManager manager = new FileManager();
+        String fileName = "testFiles/TestEmployees";
+        manager.JSONWriter(TestDataMaker.makeAlBundy(), fileName);
+        manager.JSONWriter(TestDataMaker.makeJohnDoe(), fileName);
+        manager.JSONWriter(TestDataMaker.makeBillyOvertime(), fileName);
     }
     
 }

@@ -19,6 +19,12 @@ public class Shift {
         endTime = "0000";
     }
     
+    public Shift(String start, String end)
+    {
+        startTime = start;
+        endTime = end;
+    }
+    
     public String getStartTime()
     {
         return startTime;
@@ -45,6 +51,24 @@ public class Shift {
         int hours = (Integer.parseInt( time.substring(0, 2) ) *60 );
         int minutes = Integer.parseInt ( time.substring(2,4) );
         return (hours + minutes);
+    }
+    
+    public boolean overlaps(Shift otherShift)
+    {
+        Integer shiftOneStart = this.timeToMinutes(this.getStartTime());
+        Integer shiftOneEnd = this.timeToMinutes(this.getEndTime());
+        Integer shiftTwoStart = this.timeToMinutes(otherShift.getStartTime());
+        Integer shiftTwoEnd = this.timeToMinutes(otherShift.getEndTime())        ;
+        
+        // If shift one starts or ends in the middle of shift two, then it overlaps
+        if ( ( (shiftOneStart - shiftTwoStart) >= 0) && ((shiftOneStart - shiftTwoEnd) <= 0) 
+             || 
+             ((shiftOneEnd - shiftTwoStart) >= 0) &&  ((shiftOneEnd - shiftTwoEnd) <= 0)
+            )
+        {
+            return true;
+        }
+        return false;
     }
     
     @Override

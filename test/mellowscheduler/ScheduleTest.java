@@ -7,6 +7,7 @@ package mellowscheduler;
 
 import java.util.ArrayList;
 import mellowscheduler.Constraints.Constraint;
+import mellowscheduler.Constraints.EmployeeAvailabilityConstraint;
 import mellowscheduler.Constraints.FillAllShiftsConstraint;
 import mellowscheduler.Constraints.WeeklyHoursConstraint;
 import org.junit.AfterClass;
@@ -25,6 +26,8 @@ public class ScheduleTest {
     
     @BeforeClass
     public static void setUpClass() {
+        TestDataMaker.makeAllTestEmployeesFile();
+        
     }
     
     @AfterClass
@@ -73,8 +76,10 @@ public class ScheduleTest {
         ArrayList<Constraint> constraints = new ArrayList<>();
         FillAllShiftsConstraint fillAllShifts = new FillAllShiftsConstraint();
         WeeklyHoursConstraint weeklyHours = new WeeklyHoursConstraint();
+        EmployeeAvailabilityConstraint available = new EmployeeAvailabilityConstraint();
         constraints.add(fillAllShifts);
         constraints.add(weeklyHours);
+        constraints.add(available);
         
         //Make Shifts
         ArrayList<Shift> shifts = new ArrayList<>();

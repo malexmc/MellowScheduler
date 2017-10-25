@@ -67,12 +67,21 @@ public class FileManager {
         //Make sure new employee is not already in system
         for (Employee currentEmployee : employees)
         {
-            //Assume employees with same name are the same person
-            if (currentEmployee.getFirstName().equals(employeeToWrite.getFirstName()) && currentEmployee.getLastName().equals(employeeToWrite.getLastName()))
+            //If they are equal...
+            if (currentEmployee.equals(employeeToWrite))
             {
+
                 //TODO: make this return some message to let user know employee already existed.
                 return null;
             }
+            //But they do have the same name...
+            else if(currentEmployee.getFirstName().equals(employeeToWrite.getFirstName())
+                        && currentEmployee.getLastName().equals(employeeToWrite.getLastName()))
+                {
+                    //Need to remove the old employee so that the information can be updated
+                    employees.remove(employees.indexOf(currentEmployee));
+                    break;
+                }
         }
 
         employees.add(employeeToWrite);
@@ -88,10 +97,10 @@ public class FileManager {
                 //Make employee into JSON object, and add to list.
                 JSONObject newJSON = new JSONObject();
 
-                newJSON.put("first name", employeeToWrite.getFirstName());
-                newJSON.put("last name", employeeToWrite.getLastName());
-                newJSON.put("hourly wage", employeeToWrite.getHourlyWage().toString());
-                newJSON.put("quality", employeeToWrite.getQuality().toString());
+                newJSON.put("first name", currentEmployee.getFirstName());
+                newJSON.put("last name", currentEmployee.getLastName());
+                newJSON.put("hourly wage", currentEmployee.getHourlyWage().toString());
+                newJSON.put("quality", currentEmployee.getQuality().toString());
 
                 
                 JSONArray allUnavailabilities = new JSONArray();
@@ -295,7 +304,7 @@ public class FileManager {
                         
                         //Store in Shift object
                         currentShift.setStartTime((String) shiftJSON.get("start time"));
-                        currentShift.setStartTime((String) shiftJSON.get("end time"));
+                        currentShift.setEndTime((String) shiftJSON.get("end time"));
                         
                         //Add shift to day's list
                         shiftList.add(currentShift);
