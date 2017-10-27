@@ -25,6 +25,7 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
+import javafx.scene.control.TabPane.TabClosingPolicy;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.ColumnConstraints;
@@ -58,14 +59,14 @@ public class MellowScheduler extends Application {
     }
     
     //Makes and returns a view list of the employees
-    public ArrayList<Employee> makeEmployeeList()
+    public static ArrayList<Employee> makeEmployeeList()
     {
         FileManager manager = new FileManager();
         return manager.JSONReader(new ArrayList<Employee>(), "Employees");
         
     }
     
-    public ListView makeEmployeeListView(ArrayList<Employee> employees)
+    public static ListView makeEmployeeListView(ArrayList<Employee> employees)
     {
         //Make and populate the list view to show the employee names in the box
         ListView<String> employeeListView = new ListView();
@@ -129,12 +130,12 @@ public class MellowScheduler extends Application {
             }
         });
         
-        //Handler for button.
+        //Handler for schedule button.
         scheduleButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             //TODO: Implement this when it's time for the scheduler page
             public void handle(ActionEvent e) {
-                //swapScene(sceneNames.NEW_EMPLOYEE, primaryStage);
+                swapScene(sceneNames.SCHEDULE, primaryStage);
             }
         });
 
@@ -152,7 +153,7 @@ public class MellowScheduler extends Application {
         column1.setPercentWidth(30);
         grid.getColumnConstraints().add(column1);
         
-        Text scenetitle = new Text("New Employee");
+        Text scenetitle = new Text("Employee Data");
         scenetitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
         
         VBox employeeListVBox = new VBox();
@@ -218,8 +219,13 @@ public class MellowScheduler extends Application {
         grid.add(unavailable, 5, 6);
         GridPane.setValignment(unavailable, VPos.TOP);
         
+        
         //Make the tab pane, list for tabs and list for buttons in tabs
         TabPane unavailablePane = new TabPane();
+        
+        //Make panes not be able to be closed out of... We need them :)
+        unavailablePane.setTabClosingPolicy(TabClosingPolicy.UNAVAILABLE);
+        
         ArrayList<Tab> tabList = new ArrayList<>();
         ArrayList<Button> tabButtonList = new ArrayList<>();
         
@@ -408,6 +414,178 @@ public class MellowScheduler extends Application {
                     lastNameTextField.setText(selectedEmployee.getLastName());
                     hourlyWageTextField.setText(selectedEmployee.getHourlyWage().toString());
                     qualityTextField.setText(selectedEmployee.getQuality().toString());
+                    
+                    ArrayList<ArrayList<Shift>> unavailability = selectedEmployee.getUnavailable();
+                    
+                    //For each day in the week...
+                    for (int ii = 0; ii < 7; ii++)
+                    {
+                        //Store day's shifts
+                        ArrayList<Shift> currentDayShifts = unavailability.get(ii);
+
+                        //Get the day's grid
+                        ScrollPane dayScroll = (ScrollPane) unavailablePane.getTabs().get(ii).getContent();
+                        GridPane dayGrid = (GridPane) dayScroll.getContent();
+                        
+                        //Clear everything out and start from scratch
+                        dayGrid.getChildren().clear();
+                        
+                        int currentRow = 0;
+                        //For each shift that day
+                        for (Shift currentShift : currentDayShifts)
+                        {
+                            //Make textField HBox and fill fields with shift values
+                            HBox newShiftHBox = new HBox();
+                            newShiftHBox.setSpacing(5);
+                            int MAX_TEXT_HEIGHT = 20;
+                            int MAX_TEXT_WIDTH =  100;
+
+                            TextField startTime = new TextField();
+                            startTime.setText(currentShift.getStartTime());
+                            startTime.setMaxSize(MAX_TEXT_WIDTH, MAX_TEXT_HEIGHT);
+
+                            TextField endTime = new TextField();
+                            endTime.setText(currentShift.getEndTime());
+                            endTime.setMaxSize(MAX_TEXT_WIDTH, MAX_TEXT_HEIGHT);
+
+                            Text to = new Text();
+                            to.setText("-");
+
+                            newShiftHBox.getChildren().add(startTime);
+                            newShiftHBox.getChildren().add(to);
+                            newShiftHBox.getChildren().add(endTime);
+
+                            //Add HBox to grid
+                            dayGrid.add(newShiftHBox, 0, currentRow);
+                            currentRow++;
+                        }
+                            
+                        //Add Buttons to Grid
+                        HBox tabButtonHBox = new HBox();
+                        tabButtonHBox.setSpacing(5);
+
+                        Button addShiftButton = new Button("Add Unavailability");
+                        Button deleteShiftButton = new Button("-");
+                        
+                        if(currentRow == 0)
+                        {
+                            addShiftButton.setFont(Font.font("Tahoma", FontWeight.NORMAL, 12));
+                            
+                            deleteShiftButton.setFont(Font.font("Tahoma", FontWeight.BOLD, 16));     
+                            deleteShiftButton.setVisible(false);
+                        }
+                        else
+                        {
+                             addShiftButton.setText("+");
+                            addShiftButton.setFont(Font.font("Tahoma", FontWeight.BOLD, 16));
+
+                            deleteShiftButton.setFont(Font.font("Tahoma", FontWeight.BOLD, 16));
+                        }
+
+                        //Make the handler for the add shift button
+                        addShiftButton.setOnAction((ActionEvent e) -> 
+                        {
+                            //Get the tab's content
+                            Tab currentTab = unavailablePane.getSelectionModel().getSelectedItem();
+                            ScrollPane currentTabScroll = (ScrollPane) currentTab.getContent();
+                            GridPane currentTabGrid = (GridPane) currentTabScroll.getContent();
+
+
+                            int buttonRow   = GridPane.getRowIndex(tabButtonHBox);
+                            int buttonColumn = GridPane.getColumnIndex(tabButtonHBox);
+
+                            //Remove buttons from grid
+                            currentTabGrid.getChildren().remove(tabButtonHBox);
+                            addShiftButton.setText("+");
+                            addShiftButton.setFont(Font.font("Tahoma", FontWeight.BOLD, 16));
+
+                            //Since we definitely have at least one shift now, set the button to visible
+                            deleteShiftButton.setVisible(true);
+
+                            //Make HBox for shift adding
+                            HBox newShiftHBox = new HBox();
+                            newShiftHBox.setSpacing(5);
+                            int MAX_TEXT_HEIGHT = 20;
+                            int MAX_TEXT_WIDTH =  100;
+
+                            TextField startTime = new TextField();
+                            startTime.setPromptText("1200");
+                            startTime.setMaxSize(MAX_TEXT_WIDTH, MAX_TEXT_HEIGHT);
+
+                            TextField endTime = new TextField();
+                            endTime.setPromptText("1800");
+                            endTime.setMaxSize(MAX_TEXT_WIDTH, MAX_TEXT_HEIGHT);
+
+                            Text to = new Text();
+                            to.setText("-");
+
+                            newShiftHBox.getChildren().add(startTime);
+                            newShiftHBox.getChildren().add(to);
+                            newShiftHBox.getChildren().add(endTime);
+
+                            //Add HBox where button was and add button below it
+                            tabButtonHBox.getChildren().clear();
+                            tabButtonHBox.getChildren().add(addShiftButton);
+                            tabButtonHBox.getChildren().add(deleteShiftButton);
+
+                            currentTabGrid.add( newShiftHBox, buttonColumn, buttonRow);
+                            currentTabGrid.add( tabButtonHBox, buttonColumn, buttonRow+1);
+
+                            //Add grid to scroll tp tab
+                            currentTabScroll.setContent(currentTabGrid);
+                            currentTab.setContent(currentTabScroll);
+
+                        });
+
+                        //Make the handler for the delete shift button
+                        deleteShiftButton.setOnAction((ActionEvent e) -> 
+                        {
+                            //Get the tab's content
+                            Tab currentTab = unavailablePane.getSelectionModel().getSelectedItem();
+                            ScrollPane currentTabScroll = (ScrollPane) currentTab.getContent();
+                            GridPane currentTabGrid = (GridPane) currentTabScroll.getContent();
+
+
+                            int buttonRow   = GridPane.getRowIndex(tabButtonHBox);
+                            int buttonColumn = GridPane.getColumnIndex(tabButtonHBox);
+
+                            //Remove buttons from grid
+                            currentTabGrid.getChildren().remove(tabButtonHBox);
+
+                            //See if we're about to delete the last shift
+                            if(buttonRow < 2)
+                            {
+                                //If we did, reset the + button to original state and hide - button
+                                addShiftButton.setText("Add Unavailability");
+                                addShiftButton.setFont(Font.font("Tahoma", FontWeight.NORMAL, 12));
+                                deleteShiftButton.setVisible(false);    
+                            }
+
+                            //Delete shift HBox
+                            currentTabGrid.getChildren().remove(getNode(currentTabGrid, buttonRow-1, buttonColumn));
+
+                            //Add HBox where button was and add buttons below it
+                            tabButtonHBox.getChildren().clear();
+                            tabButtonHBox.getChildren().add(addShiftButton);
+                            tabButtonHBox.getChildren().add(deleteShiftButton);
+
+                            currentTabGrid.add( tabButtonHBox, buttonColumn, buttonRow-1);
+
+                            //Add grid to scroll to tab
+                            currentTabScroll.setContent(currentTabGrid);
+                            currentTab.setContent(currentTabScroll);
+
+                        });                        
+                        
+                        tabButtonHBox.getChildren().add(addShiftButton);
+                        tabButtonHBox.getChildren().add(deleteShiftButton);
+                        
+                        dayGrid.add(tabButtonHBox, 0, currentRow);
+                        
+                        //Add grid to scroll to tab
+                        dayScroll.setContent(dayGrid);
+                        unavailablePane.getTabs().get(ii).setContent(dayScroll);
+                    }
                 }
             }
          });        
@@ -420,6 +598,64 @@ public class MellowScheduler extends Application {
             newEmployee.setLastName(lastNameTextField.getText());
             newEmployee.setHourlyWage(Double.parseDouble(hourlyWageTextField.getText()));
             newEmployee.setQuality(Integer.parseInt(qualityTextField.getText()));
+            
+            //Handle unavailability
+            ArrayList<ArrayList<Shift>> unavailability = new ArrayList<>();
+            
+            //For each day in the week...
+            for (int ii = 0; ii < 7; ii++)
+            {
+                //Make array to store day's shifts
+                ArrayList<Shift> currentDayShifts = new ArrayList<>();
+                
+                //Get the day's grid
+                ScrollPane temp = (ScrollPane) unavailablePane.getTabs().get(ii).getContent();
+                GridPane dayGrid = (GridPane) temp.getContent();
+                int buttonRow = 0;
+                int buttonColumn = 0;
+                
+                //For each day's grid...
+                for(Node currentChild : dayGrid.getChildren())
+                {
+                    
+                    //More than likely, we are an HBox here, so if we are...
+                    if(currentChild instanceof HBox)
+                    {
+                        //Cast to HBox and get the children of it
+                        HBox currentChildHBox = (HBox) currentChild;
+                        
+                        
+                        
+                        //Check for text field children
+                        boolean textFieldChildren = false;
+                        for (Node hBoxChild : currentChildHBox.getChildren())
+                        {
+                                if(hBoxChild instanceof TextField)
+                                {
+                                    textFieldChildren = true;
+                                    break;
+                                }
+                        }
+                        
+                        //If any children are text fields...
+                        if(textFieldChildren)
+                        {
+                            //Put values into a shift
+                            Shift newShift = new Shift();
+                            newShift.setStartTime( ( (TextField) currentChildHBox.getChildren().get(0) ).getText() );
+                            newShift.setEndTime( ( (TextField) currentChildHBox.getChildren().get(2) ).getText() );
+                            
+                            //Put shift into array
+                            currentDayShifts.add(newShift);
+                        }
+                    }
+                }
+                unavailability.add(currentDayShifts);
+            }
+            
+            newEmployee.setUnavailable(unavailability);
+            
+            
             FileManager fileManager = new FileManager();
             fileManager.JSONWriter(newEmployee);
 
@@ -464,6 +700,12 @@ public class MellowScheduler extends Application {
                 employeeGridBuilder(grid, primaryStage);
                 newScene = new Scene(grid, 960, 540);
                 break;
+                
+            case SCHEDULE:
+                ScheduleGridBuilder builder = new ScheduleGridBuilder();
+                builder.makeScheduleGrid(grid, primaryStage);
+                newScene = new Scene(grid, 960, 540);
+                break;
         }
 
         //Scene code.
@@ -482,7 +724,8 @@ public class MellowScheduler extends Application {
 
     public enum sceneNames {
         START,
-        NEW_EMPLOYEE
+        NEW_EMPLOYEE,
+        SCHEDULE
     }
 
     /**
