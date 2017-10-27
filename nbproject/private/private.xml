@@ -3,14 +3,12 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/Users/Alex/Documents/NetBeansProjects/MellowScheduler/test/mellowscheduler/FileManagerTest.java</file>
-            <file>file:/C:/Users/Alex/Documents/NetBeansProjects/MellowScheduler/src/mellowscheduler/FXMLDocumentController.java</file>
-            <file>file:/C:/Users/Alex/Documents/NetBeansProjects/MellowScheduler/src/mellowscheduler/FileManager.java</file>
-            <file>file:/C:/Users/Alex/Documents/NetBeansProjects/MellowScheduler/src/mellowscheduler/FXMLDocument.fxml</file>
-            <file>file:/C:/Users/Alex/Documents/NetBeansProjects/MellowScheduler/src/mellowscheduler/MellowScheduler.java</file>
-            <file>file:/C:/Users/Alex/Documents/NetBeansProjects/MellowScheduler/src/mellowscheduler/Employee.java</file>
-            <file>file:/C:/Users/Alex/Documents/NetBeansProjects/MellowScheduler/src/mellowscheduler/Schedule.java</file>
-            <file>file:/C:/Users/Alex/Documents/NetBeansProjects/MellowScheduler/src/mellowscheduler/Shift.java</file>
+            <file>file:/C:/Users/Alex%20McClellan/Documents/NetbeansProjects/MellowScheduler/src/mellowscheduler/ScheduleGridBuilder.java</file>
+            <file>file:/C:/Users/Alex%20McClellan/Documents/NetbeansProjects/MellowScheduler/test/mellowscheduler/FileManagerTest.java</file>
+            <file>file:/C:/Users/Alex%20McClellan/Documents/NetbeansProjects/MellowScheduler/src/mellowscheduler/MellowScheduler.java</file>
+            <file>file:/C:/Users/Alex%20McClellan/Documents/NetbeansProjects/MellowScheduler/test/mellowscheduler/EmployeeTest.java</file>
+            <file>file:/C:/Users/Alex%20McClellan/Documents/NetbeansProjects/MellowScheduler/src/mellowscheduler/Employee.java</file>
+            <file>file:/C:/Users/Alex%20McClellan/Documents/NetbeansProjects/MellowScheduler/src/mellowscheduler/FileManager.java</file>
         </group>
     </open-files>
 </project-private>

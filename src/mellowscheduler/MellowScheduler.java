@@ -43,6 +43,8 @@ import javafx.stage.Stage;
  */
 public class MellowScheduler extends Application {
 
+    public ScheduleGridBuilder schdeuleGridBuilder;
+        
     public Node getNode(GridPane grid, final int row, final int column)
     {
         Node result = null;
@@ -702,8 +704,13 @@ public class MellowScheduler extends Application {
                 break;
                 
             case SCHEDULE:
-                ScheduleGridBuilder builder = new ScheduleGridBuilder();
-                builder.makeScheduleGrid(grid, primaryStage);
+                
+                if(schdeuleGridBuilder == null)
+                {
+                    schdeuleGridBuilder = new ScheduleGridBuilder();
+                }
+                schdeuleGridBuilder.makeScheduleGrid(grid, primaryStage);
+                //newScene = new Scene(grid, 1920, 1080);
                 newScene = new Scene(grid, 960, 540);
                 break;
         }
@@ -717,6 +724,8 @@ public class MellowScheduler extends Application {
     @Override
     public void start(Stage primaryStage) {
 
+        schdeuleGridBuilder = null;
+        
         //Stage is the big daddy for the whole application. Ours is primaryStage here.
         primaryStage.setTitle("JavaFX Welcome");
         swapScene(sceneNames.START, primaryStage);
