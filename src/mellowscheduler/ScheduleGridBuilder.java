@@ -5,12 +5,12 @@
  */
 package mellowscheduler;
 
-import com.sun.org.apache.bcel.internal.classfile.Code;
 import java.util.ArrayList;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Tab;
@@ -139,7 +139,7 @@ public class ScheduleGridBuilder {
         return grid;
     }
     
-    public GridPane makeScheduleGrid(GridPane grid, Stage primaryStage)
+    public GridPane makeScheduleGrid(GridPane grid, Stage primaryStage, MellowScheduler mellowScheduler)
     {
         grid.setAlignment(Pos.CENTER);
         grid.setHgap(10);
@@ -187,6 +187,14 @@ public class ScheduleGridBuilder {
         Button shiftSetButton = new Button("Set Shifts");
         shiftSetButton.setFont(Font.font("Tahoma", FontWeight.NORMAL, 12));
         shiftAndConstraintHBox.getChildren().add(shiftSetButton);
+        
+        //Handler for Employee button.
+        shiftSetButton.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent e) {
+                mellowScheduler.swapScene(MellowScheduler.sceneNames.SHIFT, primaryStage);
+            }
+        });
         
         //Make Constraints Button
         Button constraintSetButton = new Button("Set Constraints");

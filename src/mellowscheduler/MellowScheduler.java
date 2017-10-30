@@ -44,8 +44,9 @@ import javafx.stage.Stage;
 public class MellowScheduler extends Application {
 
     public ScheduleGridBuilder schdeuleGridBuilder;
+    public ShiftGridBuilder shiftGridBuilder;
         
-    public Node getNode(GridPane grid, final int row, final int column)
+    public static Node getNode(GridPane grid, final int row, final int column)
     {
         Node result = null;
         ObservableList<Node> childrens = grid.getChildren();
@@ -703,13 +704,23 @@ public class MellowScheduler extends Application {
                 newScene = new Scene(grid, 960, 540);
                 break;
                 
+            case SHIFT:
+                if(shiftGridBuilder == null)
+                {
+                    shiftGridBuilder = new ShiftGridBuilder();
+                }
+                shiftGridBuilder.makeShiftGrid(grid, primaryStage, this);
+                //newScene = new Scene(grid, 1920, 1080);
+                newScene = new Scene(grid, 960, 540);
+                break;
+                
             case SCHEDULE:
                 
                 if(schdeuleGridBuilder == null)
                 {
                     schdeuleGridBuilder = new ScheduleGridBuilder();
                 }
-                schdeuleGridBuilder.makeScheduleGrid(grid, primaryStage);
+                schdeuleGridBuilder.makeScheduleGrid(grid, primaryStage, this);
                 //newScene = new Scene(grid, 1920, 1080);
                 newScene = new Scene(grid, 960, 540);
                 break;
@@ -734,7 +745,8 @@ public class MellowScheduler extends Application {
     public enum sceneNames {
         START,
         NEW_EMPLOYEE,
-        SCHEDULE
+        SCHEDULE,
+        SHIFT
     }
 
     /**
