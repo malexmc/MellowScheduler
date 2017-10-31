@@ -43,14 +43,14 @@ public class ScheduleGridBuilder {
     
     public ArrayList<Employee> employees;
     public Schedule schedule;
-    private ArrayList<Shift> shifts;
+    private ArrayList<ArrayList<Shift>> shifts;
     private ArrayList<Constraint> constraints;
     
     public void setConstraints(ArrayList<Constraint> constraints)
     {
         this.constraints = constraints;
     }
-    public void setShifts(ArrayList<Shift> shifts)
+    public void setShifts(ArrayList<ArrayList<Shift>> shifts)
     {
         this.shifts = shifts;
     }
@@ -60,7 +60,7 @@ public class ScheduleGridBuilder {
         return constraints;
     }
     
-    public ArrayList<Shift> getShifts()
+    public ArrayList<ArrayList<Shift>> getShifts()
     {
         return shifts;
     }
