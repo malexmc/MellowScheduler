@@ -45,6 +45,7 @@ public class MellowScheduler extends Application {
 
     public ScheduleGridBuilder scheduleGridBuilder;
     public ShiftGridBuilder shiftGridBuilder;
+    public ConstraintGridBuilder constraintGridBuilder;
         
     public static Node getNode(GridPane grid, final int row, final int column)
     {
@@ -714,6 +715,16 @@ public class MellowScheduler extends Application {
                 newScene = new Scene(grid, 960, 540);
                 break;
                 
+            case CONSTRAINT:
+                if(constraintGridBuilder == null)
+                {
+                    constraintGridBuilder = new ConstraintGridBuilder();
+                }
+                constraintGridBuilder.makeConstraintGrid(grid, primaryStage, this, this.scheduleGridBuilder);
+                //newScene = new Scene(grid, 1920, 1080);
+                newScene = new Scene(grid, 960, 540);
+                break;
+                
             case SCHEDULE:
                 
                 if(scheduleGridBuilder == null)
@@ -724,6 +735,7 @@ public class MellowScheduler extends Application {
                 //newScene = new Scene(grid, 1920, 1080);
                 newScene = new Scene(grid, 960, 540);
                 break;
+                
         }
 
         //Scene code.
@@ -746,7 +758,8 @@ public class MellowScheduler extends Application {
         START,
         NEW_EMPLOYEE,
         SCHEDULE,
-        SHIFT
+        SHIFT,
+        CONSTRAINT
     }
 
     /**

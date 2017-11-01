@@ -201,6 +201,13 @@ public class ScheduleGridBuilder {
         constraintSetButton.setFont(Font.font("Tahoma", FontWeight.NORMAL, 12));
         shiftAndConstraintHBox.getChildren().add(constraintSetButton);
         
+        constraintSetButton.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent e) {
+                mellowScheduler.swapScene(MellowScheduler.sceneNames.CONSTRAINT, primaryStage);
+            }
+        });
+        
         grid.add(shiftAndConstraintHBox, 3, 1);
 
         
