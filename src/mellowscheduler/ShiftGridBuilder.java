@@ -294,6 +294,18 @@ public class ShiftGridBuilder {
         grid.setVgap(10);
         grid.setPadding(new Insets(25, 25, 25, 25));
         
+        //Set row constraints for the grid
+        RowConstraints row0 = new RowConstraints();
+        row0.setPercentHeight(20);
+        RowConstraints row1 = new RowConstraints();
+        row1.setPercentHeight(60);
+        RowConstraints row2 = new RowConstraints();
+        row2.setPercentHeight(10);
+        RowConstraints row3 = new RowConstraints();
+        row3.setPercentHeight(10);
+        
+        grid.getRowConstraints().addAll(row0, row1, row2, row3);
+        
         //Unavailable tab pane header
         Text unavailable = new Text("Employee Unavailability");
         unavailable.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
