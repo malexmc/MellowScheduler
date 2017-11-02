@@ -30,6 +30,9 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import mellowscheduler.Constraints.Constraint;
+import mellowscheduler.Constraints.EmployeeAvailabilityConstraint;
+import mellowscheduler.Constraints.FillAllShiftsConstraint;
+import mellowscheduler.Constraints.WeeklyHoursConstraint;
 import static mellowscheduler.MellowScheduler.getNode;
 
 /**
@@ -48,6 +51,7 @@ public class ConstraintGridBuilder {
     public Map<constraintTypes, String> constraintTypeStringMap;
     private ArrayList<Constraint> constraints;
     public final int PREF_LIST_HEIGHT = 5 * 26;
+    public Constraint constraintInProgress;
     
     public ConstraintGridBuilder()
     {
@@ -117,21 +121,31 @@ public class ConstraintGridBuilder {
         switch (enumValue)
         {
             case FILL_ALL_SHIFTS: 
+                
+                constraintInProgress = new FillAllShiftsConstraint();
+                
                 Text fill = new Text("to fill every shift.");
                 secondaryBoxes.getChildren().add(fill);
                 break;
             
                 
             case EMPLOYEE_AVAILABILITY:
+                
+                constraintInProgress = new EmployeeAvailabilityConstraint();
+                
                 Text emp = new Text("to respect employee unavalability."); 
                 secondaryBoxes.getChildren().add(emp);
                 break;
                 
             case WEEKLY_HOURS:
+                
+                WeeklyHoursConstraint weeklyHoursConstraint = new WeeklyHoursConstraint();
+                constraintInProgress = weeklyHoursConstraint;
+                
                 Text week = new Text("to give");
                 secondaryBoxes.getChildren().add(week);
                 
-                //Employee List + All Employees
+                // Employee List + All Employees
                 ScrollPane employeeScrollPane = new ScrollPane();
                 
                 FileManager manager = new FileManager();
@@ -139,6 +153,8 @@ public class ConstraintGridBuilder {
                 
                 ListView employeeListView = MellowScheduler.makeEmployeeListView(employees);
                 employeeListView.getItems().add(0, "All Employees");
+                
+                
                 employeeListView.setPrefHeight(PREF_LIST_HEIGHT);
                 
                 
@@ -176,6 +192,56 @@ public class ConstraintGridBuilder {
         builderGrid.add(secondaryBoxes, 3, 0);
     }
     
+    public void saveConstraintBuilder(GridPane builderGrid, constraintTypes enumValue)
+    {
+        switch (enumValue)
+        {
+            case FILL_ALL_SHIFTS: 
+                constraints.add(new FillAllShiftsConstraint());
+                break;
+            
+                
+            case EMPLOYEE_AVAILABILITY:
+                constraints.add(new EmployeeAvailabilityConstraint());
+                break;
+                
+            case WEEKLY_HOURS:
+                
+                ArrayList<Constraint> weeklyHoursConstraints = new ArrayList<>();
+                FileManager manager = new FileManager();
+                ArrayList<Employee> employees = manager.JSONReader(new ArrayList<Employee>(), "Employees");
+                
+                
+                //Get employee to add
+                ScrollPane scrollPane= (ScrollPane) MellowScheduler.getNode(builderGrid, 1, 0);
+                ListView employeeListView = (ListView) scrollPane.getChildrenUnmodifiable();
+                
+                int selectedIndex = employeeListView.getSelectionModel().getSelectedIndex();
+                
+                //If we have selected a valid constraint 
+                if(employeeListView.getSelectionModel().getSelectedIndex() < constraintTypeStringMap.size()
+                     && employeeListView.getSelectionModel().getSelectedIndex() >= 0      
+                  )
+                {
+                    
+                 if(selectedIndex == 0)
+                 {
+                     for(int ii = 0; ii < employees.size(); ii++)
+                     {
+                         
+                     }
+                 }
+       
+                }
+                
+                break;
+                
+            default:
+                throw new AssertionError(enumValue.name());
+            
+        }
+    }
+    
     //Makes the constraint display portion of the grid
     public void makeConstraintDisplay()
     {
@@ -208,6 +274,8 @@ public class ConstraintGridBuilder {
                      && constraintListView.getSelectionModel().getSelectedIndex() >= 0      
                   )
                 {
+                    constraintInProgress = null;
+                    
                     String constraintString = constraintListView.getSelectionModel().getSelectedItem().toString();
                     for (constraintTypes enumValue : constraintTypeStringMap.keySet())
                     {
@@ -232,70 +300,64 @@ public class ConstraintGridBuilder {
     
     //Makes the save button to the grid
     //TODO: Make this correct for constraint Builder
-    public Button makeSaveButton(TabPane shiftPane, ScheduleGridBuilder scheduleGridBuilder)
+    public Button makeSaveButton(GridPane gridPane, ScheduleGridBuilder scheduleGridBuilder)
     {
-        Button saveButton = new Button("Save Shifts");
         
-//        //Handler for save button.
-//        saveButton.setOnAction((ActionEvent e) -> {
-//            
-//            //Make ArrayList to hold our shifts
-//            ArrayList<ArrayList<Shift>> shiftListList = new ArrayList<>();
-//            
-//            //For each day in the week...
-//            for (int ii = 0; ii < 7; ii++)
-//            {
-//                //Make array to store day's shifts
-//                ArrayList<Shift> currentDayShifts = new ArrayList<>();
-//                
-//                //Get the day's grid
-//                ScrollPane temp = (ScrollPane) shiftPane.getTabs().get(ii).getContent();
-//                GridPane dayGrid = (GridPane) temp.getContent();
-//                int buttonRow = 0;
-//                int buttonColumn = 0;
-//                
-//                //For each day's grid...
-//                for(Node currentChild : dayGrid.getChildren())
-//                {
-//                    
-//                    //More than likely, we are an HBox here, so if we are...
-//                    if(currentChild instanceof HBox)
-//                    {
-//                        //Cast to HBox and get the children of it
-//                        HBox currentChildHBox = (HBox) currentChild;
-//                        
-//                        
-//                        
-//                        //Check for text field children
-//                        boolean textFieldChildren = false;
-//                        for (Node hBoxChild : currentChildHBox.getChildren())
+        //Make save button and set it disabled until we click some stuff in the dialog
+        Button saveButton = new Button("Save Constraint");
+        saveButton.setDisable(true);
+        
+        //Handler for save button
+        saveButton.setOnAction( (ActionEvent e) -> {
+            
+            //Go to the constraint builder
+            GridPane constraintBuilderGrid = (GridPane) MellowScheduler.getNode(gridPane, 0, 3);
+            
+            //Get the selected constraint type.
+            ScrollPane constraintTypeScrollPane = (ScrollPane) MellowScheduler.getNode(constraintBuilderGrid, 1, 0);
+            ListView constraintTypeListView = (ListView) constraintTypeScrollPane.getChildrenUnmodifiable();
+            
+            //If we have selected a valid constraint 
+            if(constraintTypeListView.getSelectionModel().getSelectedIndex() < constraintTypeStringMap.size()
+                 && constraintTypeListView.getSelectionModel().getSelectedIndex() >= 0      
+              )
+            {
+                constraintInProgress = null;
+
+                String constraintString = constraintTypeListView.getSelectionModel().getSelectedItem().toString();
+                for (constraintTypes enumValue : constraintTypeStringMap.keySet())
+                {
+                    //If we find the matching enum value for the selected box, show the UI pieces related to that box
+                    if(constraintTypeStringMap.get(enumValue).equals(constraintString))
+                    {
+                        saveConstraintBuilder(constraintBuilderGrid, enumValue);
+                    }
+                }
+            }
+            
+            
+            
+            //Get the selected constraint type. That will govern what to do next...
+        
+//                employeeListView.setOnMouseClicked(new EventHandler<MouseEvent>() {
+//
+//                    @Override
+//                    public void handle(MouseEvent event) {
+//
+//                        // If we have selected a valid constraint 
+//                        if(employeeListView.getSelectionModel().getSelectedIndex() < employees.size() + 1
+//                             && employeeListView.getSelectionModel().getSelectedIndex() >= 0      
+//                          )
 //                        {
-//                                if(hBoxChild instanceof TextField)
-//                                {
-//                                    textFieldChildren = true;
-//                                    break;
-//                                }
-//                        }
-//                        
-//                        //If any children are text fields...
-//                        if(textFieldChildren)
-//                        {
-//                            //Put values into a shift
-//                            Shift newShift = new Shift();
-//                            newShift.setStartTime( ( (TextField) currentChildHBox.getChildren().get(0) ).getText() );
-//                            newShift.setEndTime( ( (TextField) currentChildHBox.getChildren().get(2) ).getText() );
 //                            
-//                            //Put shift into array
-//                            currentDayShifts.add(newShift);
 //                        }
+//
 //                    }
-//                }
-//                shiftListList.add(currentDayShifts);
-//            }
-//            
-//            scheduleGridBuilder.setShifts(shiftListList);
-//            
-//        });
+//                 });
+            
+            
+        });
+        
         
         return saveButton;
     }
