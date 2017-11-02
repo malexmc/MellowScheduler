@@ -28,6 +28,11 @@ public class WeeklyHoursConstraint implements Constraint{
         employee = e;
     }
     
+    public void setMax(Boolean max)
+    {
+        this.max = max;
+    }
+    
     public void setHours(int h)
     {
         hours = h;
@@ -41,6 +46,11 @@ public class WeeklyHoursConstraint implements Constraint{
     public int getHours()
     {
         return hours;
+    }
+    
+    public Boolean getMax()
+    {
+        return max;
     }
     
     // Checks that constraint is satisfied when applied to all employees
@@ -74,5 +84,24 @@ public class WeeklyHoursConstraint implements Constraint{
         }
         
         return true;
+    }
+        
+    @Override
+    public String printString()
+    {
+        String printString = "Make sure that " + employee.getFirstName() + " " + employee.getLastName() + " works no ";
+
+        if(max)
+        {
+            printString += "more than ";
+        }
+        else
+        {
+            printString += "less than ";
+        }
+        
+        printString += Integer.toString(hours) + " hours.";
+        
+        return printString;
     }
 }

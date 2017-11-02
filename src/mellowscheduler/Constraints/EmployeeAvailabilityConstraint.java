@@ -67,4 +67,12 @@ public class EmployeeAvailabilityConstraint implements Constraint{
         return true;
     }
     
+    @Override
+    public String printString()
+    {
+        String printString = "Respect employee availability.";
+        
+        return printString;
+    }
+    
 }

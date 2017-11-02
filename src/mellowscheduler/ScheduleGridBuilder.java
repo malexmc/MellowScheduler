@@ -176,7 +176,7 @@ public class ScheduleGridBuilder {
         grid.add(loadScheduleButton, 0, 0);
         
         //For Debugging Only!
-        grid.setGridLinesVisible(true);
+        //grid.setGridLinesVisible(true);
         
         
         //Make HBox to hold shift and constraint buttons

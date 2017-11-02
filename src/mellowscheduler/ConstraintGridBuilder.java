@@ -25,6 +25,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.RowConstraints;
+import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
@@ -52,6 +53,8 @@ public class ConstraintGridBuilder {
     private ArrayList<Constraint> constraints;
     public final int PREF_LIST_HEIGHT = 5 * 26;
     public Constraint constraintInProgress;
+    public MellowScheduler mellowScheduler;
+    public Stage primaryStage;
     
     public ConstraintGridBuilder()
     {
@@ -59,6 +62,7 @@ public class ConstraintGridBuilder {
         constraintTypeStringMap.put(constraintTypes.WEEKLY_HOURS, "Weekly Hours");
         constraintTypeStringMap.put(constraintTypes.FILL_ALL_SHIFTS, "Shift Filling");
         constraintTypeStringMap.put(constraintTypes.EMPLOYEE_AVAILABILITY, "Employees Unavailability");
+        
     }
     
     public ArrayList<Constraint> getConstraints()
@@ -192,7 +196,7 @@ public class ConstraintGridBuilder {
         builderGrid.add(secondaryBoxes, 3, 0);
     }
     
-    public void saveConstraintBuilder(GridPane builderGrid, constraintTypes enumValue)
+    public void saveConstraintBuilder(GridPane builderGrid, constraintTypes enumValue, ScheduleGridBuilder scheduleGridBuilder)
     {
         switch (enumValue)
         {
@@ -211,41 +215,96 @@ public class ConstraintGridBuilder {
                 FileManager manager = new FileManager();
                 ArrayList<Employee> employees = manager.JSONReader(new ArrayList<Employee>(), "Employees");
                 
+                //Get min or max value first
+                Boolean maxValue = false;
                 
-                //Get employee to add
-                ScrollPane scrollPane= (ScrollPane) MellowScheduler.getNode(builderGrid, 1, 0);
-                ListView employeeListView = (ListView) scrollPane.getChildrenUnmodifiable();
+                System.out.print(MellowScheduler.getNode(builderGrid, 0, 3).getClass().toString());
+                HBox secondaryPanes = (HBox) MellowScheduler.getNode(builderGrid, 0, 3);
+                ListView minMaxListView = (ListView) secondaryPanes.getChildren().get(2);
                 
-                int selectedIndex = employeeListView.getSelectionModel().getSelectedIndex();
+                int minMaxselectedIndex = minMaxListView.getSelectionModel().getSelectedIndex();
                 
                 //If we have selected a valid constraint 
-                if(employeeListView.getSelectionModel().getSelectedIndex() < constraintTypeStringMap.size()
-                     && employeeListView.getSelectionModel().getSelectedIndex() >= 0      
+                if(minMaxselectedIndex < 2
+                     && minMaxselectedIndex >= 0      
                   )
                 {
+                    //If what we selected indicates we want a max
+                    if(minMaxListView.getSelectionModel().getSelectedItem().toString().equals("At Most"))
+                    {
+                        maxValue = true;
+                    }
                     
-                 if(selectedIndex == 0)
+                }
+                
+                //Get hours threshold next by taking what's in the text box and making it a double
+                int hours = Integer.parseInt(((TextField) secondaryPanes.getChildren().get(3)).getText());
+                
+                //Get employee(s) to add
+                ScrollPane employeeScrollPane = (ScrollPane) secondaryPanes.getChildren().get(1);
+                ListView employeeListView = (ListView) employeeScrollPane.getContent();
+                
+                int employeeSelectedIndex = employeeListView.getSelectionModel().getSelectedIndex();
+                
+                //If we have selected a valid constraint 
+                if(employeeSelectedIndex < employees.size()+1
+                     && employeeSelectedIndex >= 0      
+                  )
+                {
+                // IF we want to constrain all employees...
+                 if(employeeSelectedIndex == 0)
                  {
+                     //Make a constraint for each of them
                      for(int ii = 0; ii < employees.size(); ii++)
                      {
-                         
+                         WeeklyHoursConstraint newConstraint = new WeeklyHoursConstraint();
+                         newConstraint.setEmployee(employees.get(ii));
+                         newConstraint.setHours(hours);
+                         newConstraint.setMax(maxValue);
+                         constraints.add(newConstraint);
                      }
                  }
-       
+                 //Otherwise, just get the employee we want, and put him/her in
+                 else
+                 {
+                     WeeklyHoursConstraint newConstraint = new WeeklyHoursConstraint();
+                     newConstraint.setEmployee(employees.get(employeeSelectedIndex-1));
+                     newConstraint.setHours(hours);
+                     newConstraint.setMax(maxValue);
+                     constraints.add(newConstraint);
+                 }
                 }
+                
                 
                 break;
                 
             default:
-                throw new AssertionError(enumValue.name());
-            
+                break;
         }
     }
     
     //Makes the constraint display portion of the grid
-    public void makeConstraintDisplay()
+    public ScrollPane makeConstraintDisplay()
     {
-    
+
+        
+        ScrollPane constraintScrollPane = new ScrollPane();
+        
+        if(constraints != null 
+            && constraints.isEmpty() == false
+          )
+        {
+            VBox constraintsVBox = new VBox();
+        
+            for(Constraint constraint : constraints)
+            {
+                constraintsVBox.getChildren().add(new Text(constraint.printString()));
+            }
+
+            constraintScrollPane.setContent(constraintsVBox);
+        }
+        
+        return constraintScrollPane;
     }
     
     //Makes the constraint builder section of the grid
@@ -282,7 +341,6 @@ public class ConstraintGridBuilder {
                         //If we find the matching enum value for the selected box, show the UI pieces related to that box
                         if(constraintTypeStringMap.get(enumValue).equals(constraintString))
                         {
-                            //TODO: Add new switch statement function to create remaining dialog boxes
                             updateConstraintBuilder(builderGrid, enumValue);
                         }
                     }
@@ -299,23 +357,31 @@ public class ConstraintGridBuilder {
     }
     
     //Makes the save button to the grid
-    //TODO: Make this correct for constraint Builder
     public Button makeSaveButton(GridPane gridPane, ScheduleGridBuilder scheduleGridBuilder)
     {
         
         //Make save button and set it disabled until we click some stuff in the dialog
         Button saveButton = new Button("Save Constraint");
-        saveButton.setDisable(true);
+        
+            
+        //saveButton.setDisable(true);
         
         //Handler for save button
         saveButton.setOnAction( (ActionEvent e) -> {
             
+            //Make sure constraints is initiailized
+            if(constraints == null)
+            {
+                constraints = new ArrayList<>();
+            }
+            
             //Go to the constraint builder
-            GridPane constraintBuilderGrid = (GridPane) MellowScheduler.getNode(gridPane, 0, 3);
+            GridPane constraintBuilderGrid = (GridPane) MellowScheduler.getNode(gridPane, 3, 0);
+            
             
             //Get the selected constraint type.
-            ScrollPane constraintTypeScrollPane = (ScrollPane) MellowScheduler.getNode(constraintBuilderGrid, 1, 0);
-            ListView constraintTypeListView = (ListView) constraintTypeScrollPane.getChildrenUnmodifiable();
+            ScrollPane constraintTypeScrollPane = (ScrollPane) MellowScheduler.getNode(constraintBuilderGrid, 0, 1);
+            ListView constraintTypeListView = (ListView) constraintTypeScrollPane.getContent();
             
             //If we have selected a valid constraint 
             if(constraintTypeListView.getSelectionModel().getSelectedIndex() < constraintTypeStringMap.size()
@@ -330,7 +396,9 @@ public class ConstraintGridBuilder {
                     //If we find the matching enum value for the selected box, show the UI pieces related to that box
                     if(constraintTypeStringMap.get(enumValue).equals(constraintString))
                     {
-                        saveConstraintBuilder(constraintBuilderGrid, enumValue);
+                        saveConstraintBuilder(constraintBuilderGrid, enumValue, scheduleGridBuilder);
+                        scheduleGridBuilder.setConstraints(constraints);
+                        mellowScheduler.swapScene(MellowScheduler.sceneNames.CONSTRAINT, primaryStage);
                     }
                 }
             }
@@ -381,6 +449,10 @@ public class ConstraintGridBuilder {
     public GridPane makeConstraintGrid(GridPane grid, Stage primaryStage, MellowScheduler mellowScheduler, ScheduleGridBuilder scheduleGridBuilder)
     {
         
+        constraints = scheduleGridBuilder.getConstraints();
+        this.primaryStage = primaryStage;
+        this.mellowScheduler = mellowScheduler;
+        
         //Set some grid stuff
         grid.setAlignment(Pos.TOP_CENTER);
         grid.setHgap(10);
@@ -395,7 +467,7 @@ public class ConstraintGridBuilder {
         grid.add(currentConstraintText, 0, 0);
         
         //Display current constraints
-        makeConstraintDisplay();
+        grid.add(makeConstraintDisplay(), 0, 1);
         
         //Label for constraint builder
         Text constraintBuilderText = new Text("Make Constraints:");
@@ -406,9 +478,10 @@ public class ConstraintGridBuilder {
         grid.add(makeConstraintBuilder(), 0, 3);
         
         //Save constraints
+        grid.add(makeSaveButton(grid, scheduleGridBuilder), 0, 4);
         
         //Return to schedule
-        grid.add(makeReturnButton(mellowScheduler, primaryStage), 0, 4);
+        grid.add(makeReturnButton(mellowScheduler, primaryStage), 0, 5);
         
         return grid;
     }

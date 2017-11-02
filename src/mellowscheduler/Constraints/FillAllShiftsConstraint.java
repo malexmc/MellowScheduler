@@ -50,4 +50,12 @@ public class FillAllShiftsConstraint implements Constraint{
         }
         return true;
     }
+    
+    @Override
+    public String printString()
+    {
+        String printString = "Make sure all shifts are filled.";
+        
+        return printString;
+    }
 }

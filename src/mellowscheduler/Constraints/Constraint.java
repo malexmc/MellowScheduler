@@ -15,4 +15,6 @@ public interface Constraint {
     
     boolean satisfied(Object obj);
     
+    String printString();
+    
 }
