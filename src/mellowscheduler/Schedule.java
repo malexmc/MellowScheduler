@@ -289,7 +289,7 @@ public class Schedule {
         return true;
     }
         
-    public void makeSchedule(ArrayList<Constraint> constraints, ArrayList<Shift> shifts, ArrayList<Employee> employees) throws Exception
+    public void makeSchedule(ArrayList<Constraint> constraints, ArrayList<ArrayList<Shift>> shifts, ArrayList<Employee> employees) throws Exception
     {
         int x = 0;
         while(x < 100)
@@ -298,8 +298,8 @@ public class Schedule {
             long seed = System.nanoTime();
             Collections.shuffle(constraints, new Random(seed));
 
-            seed = System.nanoTime();
-            Collections.shuffle(shifts, new Random(seed));
+//            seed = System.nanoTime();
+//            Collections.shuffle(shifts, new Random(seed));
 
             seed = System.nanoTime();
             Collections.shuffle(employees, new Random(seed));
@@ -316,9 +316,11 @@ public class Schedule {
 
                 ArrayList<ArrayList<Employee>> allShiftAvailableEmployees = new ArrayList<>();
                 Map<Employee, Shift> works = new HashMap<>();
-
+                
+                ArrayList<Shift> currentDayShifts = shifts.get(ii);
+                
                 //For each shift, save all employees that can work it based on availability
-                for (Shift openShift : shifts)
+                for (Shift openShift : currentDayShifts)
                 {
                     ArrayList<Employee> availableEmployees = new ArrayList<>();
                     for(Employee currentEmployee : employees)
@@ -346,7 +348,7 @@ public class Schedule {
                     //If employee can be added to a shift, and doesn't have an overlapping shift, schedule him/her
 
                     //Get the current shift
-                    Shift currentShift = shifts.get(jj);
+                    Shift currentShift = currentDayShifts.get(jj);
 
                     boolean shiftAdded = false;
                     //For every employee available for currentShift...

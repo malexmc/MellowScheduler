@@ -47,6 +47,11 @@ public class Shift {
     
     public int timeToMinutes(String time)
     {
+        if(time.length() != 4)
+        {
+            int one = 1;
+        }
+        
                //Parse first to chars as hours. *60 to get mins. Parse second pair of chars as minutes. Add together to get total mins      
         int hours = (Integer.parseInt( time.substring(0, 2) ) *60 );
         int minutes = Integer.parseInt ( time.substring(2,4) );
@@ -61,9 +66,12 @@ public class Shift {
         Integer shiftTwoEnd = this.timeToMinutes(otherShift.getEndTime())        ;
         
         // If shift one starts or ends in the middle of shift two, then it overlaps
-        if ( ( (shiftOneStart - shiftTwoStart) >= 0) && ((shiftOneStart - shiftTwoEnd) <= 0) 
+        // If shift starts  as other shift ends, then they DO NOT OVERLAP
+        if ( ( (shiftOneStart - shiftTwoStart) >= 0) && ((shiftOneStart - shiftTwoEnd) < 0) // Shift 1 starts within shift 2
              || 
-             ((shiftOneEnd - shiftTwoStart) >= 0) &&  ((shiftOneEnd - shiftTwoEnd) <= 0)
+             ((shiftOneEnd - shiftTwoStart) > 0) &&  ((shiftOneEnd - shiftTwoEnd) <= 0) // Shift 1 ends within shift 2
+             ||
+             ((shiftOneStart - shiftTwoStart) <= 0) &&  ((shiftOneEnd - shiftTwoEnd) >= 0) //Shift 1 encapsulates Shift 2
             )
         {
             return true;

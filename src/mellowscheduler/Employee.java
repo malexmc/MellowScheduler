@@ -129,19 +129,31 @@ public class Employee {
         
         Employee a = (Employee) obj;
         
+        
+        //For each day
         for(int ii = 0; ii < 7; ii++)
         {
+            
+            //Get the unavailable shifts for the both employees
             ArrayList<Shift> thisUnavailableShiftsToday = this.getUnavailable().get(ii);
             ArrayList<Shift> aUnavailableShiftsToday = a.getUnavailable().get(ii);
             
-            for(Shift thisShift: thisUnavailableShiftsToday)
+            if( !thisUnavailableShiftsToday.isEmpty() || !aUnavailableShiftsToday.isEmpty())
             {
                 boolean matched = false;
-                for(Shift aShift : aUnavailableShiftsToday)
+                for(Shift thisShift: thisUnavailableShiftsToday)
                 {
-                    if(aShift.equals(thisShift))
+                    matched = false;
+                    for(Shift aShift : aUnavailableShiftsToday)
                     {
-                        matched = true;
+                        if(aShift.equals(thisShift))
+                        {
+                            matched = true;
+                        }
+                    }
+                    if(matched == false)
+                    {
+                        return false;
                     }
                 }
                 if(matched == false)
@@ -149,6 +161,8 @@ public class Employee {
                     return false;
                 }
             }
+            
+            
             
         }
         
